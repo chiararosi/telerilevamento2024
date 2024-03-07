@@ -29,4 +29,4 @@ plot(flowers, insects, pch=19, cex=0.5)
 #In R il separatore decimale è il punto e possiamo scriverlo sia come 0.5 sia .5
 #posso anche variare il colore= col
 plot(flowers, insects, pch=19, cex=0.5, col="chocolate1")
-
+#salvare script: commit changes
