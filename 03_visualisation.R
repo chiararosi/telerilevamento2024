@@ -169,6 +169,114 @@ im.plotRGB(stacksent, r=3, g=2, b=4)
 
 pairs(stacksent)
 
+#richiamiamo i pacchetti
+library(terra)
+library(imageRy)
+im.list()
+#useremo i dati sentinel
+b2 <- im.import("sentinel.dolomites.b2.tif" )
+b3 <- im.import("sentinel.dolomites.b3.tif")
+b4 <- im.import("sentinel.dolomites.b4.tif" )
+b8 <- im.import("sentinel.dolomites.b8.tif" )
+
+#par
+#multiframe
+par(mfrow=c())
+par(mfrow=c(2,2))
+plot(b2)
+plot(b3)
+plot(b4)
+plot(b8)
+#la banda dell'infrarosso porta molte più informazioni rispetto alle altre barre che sono più omogenee
+#plot con tutti e quattro le bande usando lo stratagemma del multiframe usando par()
+#altrimenti si può applicare lo stacksent
+#ho le mie bande separate: blu, verde, rosso e infrarosso, le unisco insieme, le 4 bande in uno stack, creo la mia immagine multispettrale, con tante barre insieme
+#considero le bande come elementi di un array, 4 elementi messe in fila -> c() stack
+stacksent <-c(b2,b3,b4,b8)
+plot(stacksent)
+#stacksent è il nome del risultato della funzione c() che mi serve per creare un array
+#se io volessi plottare solo il quarto elemento dello stack, ovvero la banda n 8
+dev.off()
+#cancella i device di plottaggio precedenti, quindi par()
+plot(stacksent[[4]])
+#metto il nome dello stack e il subsent(?) dello stack che in questo caso è il quarto elemento
+#dev.off=device off. chiude il grafico
+#come si plotta un multiframe: o con par() o con c() per lo stack
+
+
+#abbiamo plottato fino ad ora le singole barre senza metterle tutte insieme in una unica immagine
+#uso delle immagini per visualizzare i colori in modo nuovo
+#chiave su come si montano i colori sul computer: schema RGB. 3 grandi filtri/colori principali: rosso, verde e blu
+#useremo la banda infrarosso. satellite sentinel. le bande si usano 3 per volta. 
+#schema di bande per vedere nuovi colori
+
+#RGB plotting
+#commentiamo per ricordarci chi sono le 4 bande
+#stacksent[[1]]= b2 = blu l'elemento n 1 corrisponde alla banda n 2 che corrisponde alla banda del blu
+#stacksent[[2]]= b3 = verde
+#stacksent[[3]]= b4 = rosso
+#stacksent[[4]] = b8 = infrarosso = nir
+#sappiamo ora quali sono le 4 bande. facciamo un plot RGB
+#funzione di imageRy im.plotRGB()
+#dichiaro il nome dell'immagine, in questo caso stacksent, e le tre componenti che corrispondono a RGB
+im.plotRGB(stacksent, )
+#prendiamo le tre componenti red, green e blu, poi abbiamo le 4 bande della nostra immagine: blu, verde, rosso e infrarosso.
+#associamo per ogni componente la banda corrispondente per vedere l'immagine con colori "naturali", con la nostra visione
+#livello n3 al red, secondo elemento al green, blu ad 1: 3,2,1
+im.plotRGB(stacksent, r=3, g=2, b=1)
+#oppure anche
+im.plotRGB(stacksent, 3, 2, 1)
+#una banda che ci viene in aiuto per la vegetazione è la riflettanza dell'infrarosso nella foglia
+#nell'immagine con i tre filtri, RGB, prendo quello del red, rosso, lo si toglie e si mette infrarosso
+#quindi invece di r=3 sarà r=4 che è la banda di infrarosso vicino
+im.plotRGB(stacksent, 4, 2, 1)
+#infrarosso al posto della componente red, tutto ciò che riflette infrarosso diventa rosso
+#la vegetazione diventa rossa. 
+#infrarosso potenzia la visione esponenzialmente rispetto alle bande del visibile
+
+par(mfrow=c()))
+#immagine colori naturali ed infrarosso
+par(mfrow=c(1,2))
+im.plotRGB(stacksent, 3, 2, 1)
+im.plotRGB(stacksent, 4, 2, 1)
+#nel telerilevamento si sostituiscono tutte, quindi le bande sono 4,3,2 sono tutte sostituzionu
+dev.off()
+im.plotRGB(stacksent, 4, 3, 2)
+#sembra esattamente la stessa cosa, chi ne governa l'immagine è quella meno correlata alle altre: l'infrarosso
+#possiamo fare un par mettendo in fila le tre immagini create
+par(mfrow=c(1,3))
+im.plotRGB(stacksent, 3, 2, 1)
+im.plotRGB(stacksent, 4, 2, 1)
+im.plotRGB(stacksent, 4, 3, 2)
+#al livello visivo le due con l'infrarosso sono praticamente la stessa cosa, regola i colori la banda non correlata ovvero l'infrarosso vicino
+#nel momento in cui cambio il filtro del rosso con l'infrarosso cambio anche le altre due, per un livello però convenzionale, l'output è proprio la stessa cosa
+dev.off()
+
+#possiamo provare a fare altre combinazioni
+im.plotRGB(stacksent, 3, 4, 2)
+#inseriamo l'infrarosso nel verde piuttosto che nel rosso: nella componente greem
+#il suolo nudo di questa combinazione diventa rosa
+#altra composizione: mettere il nir sul blu
+im.plotRGB(stacksent, 3, 2, 4)
+#il suolo nudo diventa giallo. il giallo è il colore che colpisce di più l'occhio umano
+#metto l'infrarosso nel blu, 4 nella posizione del blu=2
+#composizione spesso usata per far vedere il suolo nudo, in questo caso c'è roccia quindi non si vede bene
+
+#facciamo multiframe con le 4 immagini tutti insieme
+par(mfrow=c(1,4))
+im.plotRGB(stacksent, 3, 2, 1) #natural colors
+im.plotRGB(stacksent, 4, 3, 2) #nir on red
+im.plotRGB(stacksent, 3, 4, 2) #nir on green
+im.plotRGB(stacksent, 3, 2, 4) #nir on blu
+
+#una riga di comando, una funzione: fa una grande matrice con tutti grafici all'interno: pairs()
+#dentro la funzione c'è da mettere come argomento il nome dell'oggetto: bande del visibile molto correlate tra di loro
+pairs(stacksent)
+#il grafico ci fa vedere la correlazione di tutti i pixel per ogni banda
+#indice di correlazione di Pearson e varia tra -1 e 1: correlazione altamente positiva o altamente negativa.
+
+#possiamo sapere quanti pixel abbiamo in una immagine-> b2-> dimensions -> 934*1069
+#ci interessano le coordinate e da dove deriva l'immagine
 
 
 
