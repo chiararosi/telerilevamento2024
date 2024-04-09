@@ -99,18 +99,54 @@ m2006c <- im.classify(m2006, num_clusters=2)
 
 #il prossimo passaggio, dopo aver classificato l'immagine, vogliamo calcolare il n di pixel, in statistica si chiama frequenza, della foresta rispetto che al suolo nudo
 #tireremo fuori poi le percentuali delle due classi
+#per essere sicure delle nostre classi
+#facciamo 
+plot(m1992c)
+#abbiamo diversi colori
+#controlliamo il colore e così siamo sicuri delle classi
+plot(m2006c)
+#per vedere se combaciano i colori con le classi
+
+#ora vogliamo calcolare il numero di pixel per ogni classe
+#basta calcolare quella che si chiama frequenza
+#calculating frequencies
+#una frequenza misura il n di oggetti rispetto all'intero
 # frequencies
+#la funzione è freq()
 f1992 <- freq(m1992c)
+f1992
+#nella tabellina che esce 
+#1 e 2 significa le righe, i valori 1 e 2, poi count ovvero la conta, la conta dei pixel appartenenti alla classe 1 e alla classe 2
+> f1992
+  layer value   count
+1     1     1  304437
+2     1     2 1495563
+#qui la foresta è altamente dominante.
+
+
+#da qui possiamo calcolarci la proporzione
+#numero di pixel di una classe rispetto al totale
 
 # proportions
+#come si fa a sapere il totale
+ #ncell()
 tot1992 <- ncell(m1992c)
+#proporzione
 prop1992 = f1992 / tot1992
+#è una funzione matematica al posto di assegnazione posso mettere l'uguale
+#prendiamo solo la colonna count: 0.83 per le foreste, 0.16 per il suolo nudo
 
+#posso calcolare anche la percentuale
 # percentages
 perc1992 = prop1992 * 100
+perc1992
+#abbiamo l'83% di foresta
 
 # 17% human, 83% forest
+#questi dati ce li scriviamo perché mi servono dopo per creare un dataset
 
+
+#facciamo le frequenze per il 2006
 # frequencies
 f2006 <- freq(m2006c)
 
@@ -124,24 +160,58 @@ perc2006 = prop2006 * 100
 # 1992: 17% human, 83% forest
 # 2006: 55% human, 45% forest
 
+#abbiamo i dati, a questo punto ci costruiamo un dataset e tirare fuori dei grafici
+#si fa con la funzione data.frame()
+#in R le tabelle si chiamano dataframe
 # let's build a dataframe
+#mettiamo la classe su una colonna
+#prima colonna è la classe, che corrisponde a forest e human: due elementi di un vettore, array, e sono un testo, tutte le parti di testo nelle tabelle vengono messe tra virgolette
 class <- c("forest", "human")
-p1992 <- c(83, 17)
-p2006 <- c(45, 55)
-
-tabout <- data.frame(class, p1992, p2006)
+#la percentuale 1992 su un'altra colonna, così come per 2006
+#numeri: due elementi di un vettore
+y1992 <- c(83, 17)
+y2006 <- c(45, 55)
+#abbiamo le tre colonne
+#creo la tabella con la funzione data.frame() mettendo le tre colonne
+tabout <- data.frame(class, y1992, y2006)
 tabout
+#per vederla proprio come tabella
+View(tabout)
+
 
 # plotting the output
-ggplot(tabout, aes(x=class, y=p1992, color=class)) + geom_bar(stat="identity", fill="white")
-ggplot(tabout, aes(x=class, y=p2006, color=class)) + geom_bar(stat="identity", fill="white")
+#funzione ggplot() per creare dei grafici
+#devo mettere il nome della tabella che sto usando; aes=aestetics= estetica del grafico, la struttura
+#asse x metto foresta e human, nell'asse y metto le percentuali. aes del grafico, sulla x metto le classi, la y è uguale alla percentuale del 1992; il colore color, lo differenziamo tra le due classi
+#a questo punto dobbiamo decidere il grafico da fare, con ggplot aggiungiamo pezzi di un'altra funzione
+#la funzione è il tipo di geometria: geom_bar() quindi istogrammi; gli argomenti sono il tipo di statistica che vogliamo usare
+#"identity" la statistica è il valore esatto come ce lo abbiamo, non dobbiamo calcolarlo; il colore con il quale vogliamo riempire gli istogrammi fill="white"
+ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white")
+ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
+#parte umana super le foreste che sono in declino
 
+#si possono mettere insieme i due istogrammi
+#abbiamo prima installato il pacchetto patchwork
+#lo richiamo con library(patchwork)
 # patchwork
-p1 <- ggplot(tabout, aes(x=class, y=p1992, color=class)) + geom_bar(stat="identity", fill="white")
-p2 <- ggplot(tabout, aes(x=class, y=p2006, color=class)) + geom_bar(stat="identity", fill="white")
+#mette insieme più grafici
+#prende il primo grafico e lo assegna ad un oggetto, così come il secondo, poi con il + lo mette uno vicino all'altro
+#assegnamo ad ognuno dei due grafici, li assegnamo ad un oggetto
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white")
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
 p1 + p2
 
+#grafico sbagliato perché la scala tra i due grafici è diversa
+#come ovviare il problema: basta mettere gli assi uguali
+#la funzione è ylim()
+#ci vuole la c perché sono due elementi del vettore
+#questa è proprio una funzione che si chiama ylim()
 # varying axis and using lines
-p1 <- ggplot(tabout, aes(x=class, y=p1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
-p2 <- ggplot(tabout, aes(x=class, y=p2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
+p1 + p2
+#se volessimo diminuire il range lo possiamo fare, metterlo anche a 90 -> ylim(c(0,90))
+#l'importante è che abbiano lo stesso range
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
 p1 + p2
