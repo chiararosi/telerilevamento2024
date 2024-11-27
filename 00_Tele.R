@@ -111,6 +111,10 @@ LEZIONE 3
 
 #ora andiamo a giocare con la visualizzazione dei dati satellitari
 #si caricano dei dati, che in questo caso sono dei dati all'interno del pacchetto imageRy e si cominciano ad analizzare
+#ci focalizzeremo anche nel capire perché abbiamo installato i pacchetti la scorsa volta, riprendendo anche da dove li abbiamo installati
+#possiamo installare pacchetti sia via CRAN sia via github, per installare via github dobbiamo avere devtools precedentemente installato, per cui lo installiamo tramite CRAN
+#se voglio informazioni su imageRy basta andare sul github del prof, basta andare su Repositories e lì si trova la cartella imageRy
+
 
 #satellites data visualisation in R by imageRy
 # RS data
@@ -118,6 +122,7 @@ LEZIONE 3
 #c'è da richiamare i pacchetti che abbiamo installato per andare a lavorare sul telerilevamento
 library(imageRy)
 library(terra)
+#in questa maniera abbiamo richiamato i pacchetti
 # in case you have not terra
 # install.packages("terra")
 #devtools non ci serve più
@@ -143,8 +148,13 @@ im.list()
 #andiamo a creare un progetto con uno di questi dati
 #questi dati presentano varie estensioni possibili es. jpg
 im.import()
-im.import("matogrosso_ast_2006209_lrg.jpg")
-#NASA: Earth Observatory
+#im.import() permette l'importazione (dell'immagine) devo scrivere l'argomento dentro questa funzione
+im.import("matogrosso_ast_2006209_lrg.jpg") #mi permette di importare i dai per vederli
+#NASA: Earth Observatory, vediamo tutte le immagini della NASA
+
+#EARTH OBSERVATORY POTREBBE ESSERE UN SITO DA CUI POSSIAMO SCARICARE LE IMMAGINI PER IL NOSTRO PROGETTO
+
+
 #visualizziamo l'immagine
 #ora noi vogliamo usare l'immagine che è venuta fuori
 #creo un oggetto con uno di questi dati
@@ -161,47 +171,71 @@ mato <- im.import("matogrosso_ast_2006209_lrg.jpg")
 
 #vogliamo plottare i dati: plotting data
 plot(mato)
-
+#la scorsa volta abbiamo fatto il plot di una variabile contro un'altra, plot x ed y, adesso attraverso i pacchetti imageRy e terra facciamo solo un plot dell'immagine
+#adesso siccome vuole un attimo semplificare la visualizzazione prende in considerazione un'altra immagine, per andare poi a vedere le singole bande
 #prendiamo nella lista una immagine con una singola banda
+#nella lista sempre vista prima, ci sta questa immagine con una singola banda
 im.import("sentinel.dolomites.b2.tif")
+#dopo im.import() il contenuto in questo caso dobbiamo metterlo con le virgolette perchè l'immagine è stata salvata nella lista con già le virgolette presenti nel suo nome
+#diamo un nome a questa immagine importandola
 b2 <-im.import("sentinel.dolomites.b2.tif")
+#l'immagine satellitare è composta da tante bande, abbiamo il sensore che misura il paesaggio con varie bande, si ha ogni singolo sensore per tutte le bande che abbiamo, misura una certa lunghezza d'onda
+#quindi alla fine si ha il sensore per il rosso, giallo, blu, celeste ecc. quindi per ogni lunghezza d'onda si ha un sensore diverso che va a fare la misura, quindi in questo caso
+#la banda numero due di sentinel è la banda che corrisponde alla lunghezza d'onda del blu; sentinel è un satellite
 #b2=banda due, la importiamo
-#una immagine satellitare è composta da tante bande
 #la banda numero 2 di sentinel rappresenta la banda del blu, registra la lunghezza d'onda del blu
 #stiamo vedendo tutto quello che riflette nella lunghezza d'onda del blu
 #a questo punto possiamo cambiare la scala di colori
 #possiamo fare una scala di colori diversa, di grigi
 
-#la funzione è colorRampPalette
+#la funzione è colorRampPalette, per cambiare una scala di colori
 #funzione che cambia una certa scala di colori
 #array=vettori di più colori, per tenerli insieme c li concateniamo insieme
 #possiamo mettere anche la serie di sfumature che vogliamo, accanto mettiamo la parentesi (3)
 #lo possiamo assegnare ad un oggetto clg
+#QUESTO è UN ARRAY, questo è un vettore di più colori; degli elementi che stanno insieme
+#per tenerli insieme usiamo la funzione che si chiama c, che vuol dire CONCATENING, e li concateniamo insieme
+#un'altra cosa che possiamo inserire fuori dalla funzione, è la serie di sfumature che vogliamo es. vogliamo solo 3 sfumature (3)
+#questa colorRampPalette la associamo comunque ad un oggetto clg, l'assegniamo ad un oggetto
 clg <- colorRampPalette(c("black", "grey", "light grey"))(3)
+
+#il nero sarà quello che assorbe tutto il blu, il grigio mediamente assorbe il blu ed il bianco riflette il blu
+#R è CASE SENSITIVE
+#i colori dentro R sono immagazzinati con le virgolette
+#con questo posso fare poi il plot, con una diversa scala di colori, che abbiamo appena costruito nell'oggetto clg, per cui col, per colori col=clg
+
 plot(b2, col=clg)
-#posso anche dichiarare 100 sfumature
+
+#posso anche dichiarare 100 sfumature, possiamo cambiare il numero di 3 sfumature a 100
 clg <- colorRampPalette(c("black", "grey", "light grey"))(100)
 plot(b2, col=clg)
+#in questo modo avrò comunque i tre colori che abbiamo scritto, solo che di questi tre mi presentano ben 100 sfumature, quindi l'immagine mi verrà più distinta
 #posso variare i colori
 clcyan <- colorRampPalette(c("magenta", "cyan4", "cyan"))(100)
  plot(b2, col=clcyan)
 #per vedere i colori su R basta scrivere R package colors o R colors names
-#posso anche aggiungere più colori
+#posso anche cambiare i colori, posso cambiare le colorRampPalette, per vedere i colori disponibili basta andare su google e scrivere R PACKAGES COLORS
+#ma si possono anche aggiungere i colori
 clch <- colorRampPalette(c("magenta", "cyan4", "cyan", "chartreuse"))(100)
 plot(b2, col=clch)
-#so che la parte viola è vegetazione perché questa assorbe tutta la lunghezza d'onda del blu e del rosso,
+#qui siamo nell'onda elettromagnetica del blu, la roccia comunque riflette su tutte le lunghezze d'onda, quindi riflette anche il blu
+#so che la parte viola è vegetazione perché questa assorbe tutta la lunghezza d'onda del blu e del rosso, per fare la fotosintesi
+#la vegetazione assorbe tutta la lunghezza d'onda del blu per fare fotosintesi, abbiamo quindi una bassa riflettanza
 #mentre la roccia riflette tutte le lunghezze d'onde (è bianca), quindi riflette anche il blu
-#la riflettanza è il rapporto tra l'energia che viene davvero riflessa e (?)
+#la riflettanza è il rapporto tra l'energia che viene davvero riflessa e l'energia incidente
 
 #vediamo ora un'altra banda
 #importiamo tutte e 4 le singole bande
 #importing the additional bands
 #si va a vedere la lista di prima
 # import the green band from Sentinel-2 (band 3)
-#banda 3 560 nanometri, c'è la lunghezza d'onda verde
+#banda 3 corrisponde a 560 nanometri, è la lunghezza d'onda del verde (la visione umana va da 450 fino a 650/670 nanometri)
 # import the green band from Sentinel-2 (band 3)
 b3 <- im.import("sentinel.dolomites.b3.tif")
+#importiamo la banda 3 creandogli un oggetto su R
+#facciamo il plot della banda 3 con l'agenda, il colore clch
 plot(b3, col=clch)
+#vediamo quali sono le altre bande che dobbiamo importare, sempre dalla lista
 #facciamo anche per le altre bande: il rosso (banda 4) e infrarosso (banda 8)
 # import the red band from Sentinel-2 (band 4)
 b4 <- im.import("sentinel.dolomites.b4.tif") 
@@ -211,20 +245,21 @@ plot(b4, col=clch)
 # import the NIR band from Sentinel-2 (band 8)
 b8 <- im.import("sentinel.dolomites.b8.tif") 
 plot(b8, col=clch)
-
+#l'infrarosso dà molte più informazioni, le componenti biologiche sono molto più diverse tra loro in questa lunghezza d'onda
 
 #ora le si plotta tutte insieme
 #c'è da creare un multiframe
 #un multiframe contiene vari grafici tutti insieme
-#possiamo mettere le 4 bande tutte insieme
+#possiamo mettere le 4 bande tutte insieme (b2, b3, b4, b8), le possiamo mettere in un unico plot
 #dobbiamo creare il multiframe dove inseriremo le immagini
 #lo si fa con la funzione che si chiama par()
+#C'è DA FARE TUTTE QUESTE SPIEGAZIONI PER L'ESAME, PERCHè USIAMO QUESTA FUNZIONE, COSA C'è SCRITTO DENTRO ECC. PIù COMMENTIAMO MEGLIO è
 # multiframe
 par(mfrow=2,2)
 #mf=multiframe
 #facciamo una situazione con 2 righe e 2 colonne (4 bande)
 #mfrow=ragioniamo per righe, si hanno 2 righe, poi si hanno 2 colonne
-#questi 2 elementi par(mfrow=2,2) sono un array, quindi c'è da metterli insieme
+#questi 2 elementi par(mfrow=2,2) sono un array, quindi c'è da metterli insieme, sono gli elementi di uno stesso vettore, c'è da aggiungere la c alla funzione
 par(mfrow=c(2,2))
 #creo, senza vederlo ancora, un telaio dove metteremo le singole bande, telaio di 2x2
 #nel primo blocco, ci mettiamo la banda n 2
@@ -236,6 +271,7 @@ plot(b4, col=clch)
 #banda 8 seconda riga a dx
 plot(b8, col=clch)
 #uso par(mfrow) per mettere 4 immagini ognuna al suo posto
+#par() ci permette di creare un MULTIFRAME, una tela inizialmente vuota dove posizioneremo i plot uno vicino all'altro
 
 #esercizio
 #plot the four bands one after another in single row
@@ -245,24 +281,40 @@ plot(b3, col=clch)
 plot(b4, col=clch)
 plot(b8, col=clch)
 #una sola riga con 4 colonne, tutte le immagini si dispongono in una sola riga
+#il primo numero sono le righe, il secondo le colonne
 
 #un altro metodo è impilare le bande tutte insieme e crea una vera immagine satellitare
 #lo si fa con una procedura che si chiama stack
-#possiamo prendere tutte le bande e considerarle come elementi di un array unendole tutte insieme con la procedura stack
+#possiamo prendere tutte le bande e considerarle come elementi di un array, elementi di uno stesso blocco, unendole tutte insieme con la procedura stack
 #avrò una singola immagine satellitare dove avrò i singoli elementi uniti
+# Let's make a satellite image
 stacksent <-c(b2, b3, b4, b8)
+#poi si possono plottare i singoli elementi di uno stack
 #mi permette di fare una immagine satellitare: satellite image
 #scrivo all'interno tutti gli elementi, li metto insieme concatenandoli in un array=vettore
 #la posso plottare scrivendo plot()
 plot(stacksent, col=clch)
+#in questo caso mette i nomi che sono proprio nelle immagini
 
-#se avessimo una immagine satellitare, e vogliamo plottare solo la banda 8, il quarto elemento dell'immagine satellitare già fatta
+#se avessimo una immagine satellitare già pronta con tutte le bande dentro, e vogliamo plottare solo la banda 8, il quarto elemento dell'immagine satellitare 
 #in R i singoli elementi si selezionano con la parentesi quadra. indici di posizione=[]
 plot(stacksent[[4]], col=clch)
-#essendo in 2 dimensioni devo aggiungere altre due parentesi quadre avendo delle matrici, con una tabella basta 1 parentesi quadra
+#quarto elemento, 4, che rappresenterebbe la banda numero 8
+#una sola parentesi quadra andrebbe bene per le tabelle, mi selezion0 [4] se fa parte di una tabella
+#essendo in 2 dimensioni devo aggiungere altre due parentesi quadre avendo delle matrici, dei raster, perchè abbiamo righe e colonne dell'immagine, con una tabella basta 1 parentesi quadra
+#questo mi permette di lavorare su un singolo elemento di uno stack, di un vettore
+#per distruggere il par, ovvero il multiframe, fare dev.off()
 #per eliminare il par precedente devo fare dev.off() cancella la parte grafica precedente 
+#quando R nella parte grafica ci mantiene qualcosa che non ci piace, fare dev.off() perchè cancella il device precedente
+#####DEV.OFF() anche se ci si impalla qualche grafico
+
+#quello che abbiamo imparato oggi è che si possono importare le immagini satellitari e plottarle con colori a nostra scelta
+#li possiamo plottare in un multiframe
+#possiamo creare uno stack che ci permette di utilizzare una intera immagine satellitare
+#nella prossima lezione plottiamo i dati utilizzando tante bande insieme della stessa immagine colorata, creiamo l'immagine con le sue bande
 
 
+LEZIONE 4
 
 # stack images
 stacksent <- c(b2, b3, b4, b8)
