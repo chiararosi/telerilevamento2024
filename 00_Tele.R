@@ -516,7 +516,385 @@ b2
 #c'è poi la divisione a zone
 #dalla prossima lezione inizieremo proprio a spiegare le coordinate delle immagini
 
-LEZIONE 5
 
+#LEZIONE 5  26.03
+
+#parleremo di visualizzazioni dell'immagini da satellite
+#parleremo anche di sistemi di riferimento
+#codificazione delle immagini satellitari, quali sono i range di questi numeri, quali useremo ecc.
+#adesso capiremo cosa sono gli indici spettrali-> su gitHub si trova la presentazione sugli indici spettrali
+#le volte precedenti abbiamo visualizzato le singole bande dell'immagine satellitare e poi abbiamo visualizzato con uno schema RGB le varie bande insieme
+ #per visualizzare una certa immagine sia a colori naturali sia che a colori falsi, falsi colori, false color, ovvero come l'infrarosso
+#possiamo farlo per visualizzare una certa immagine; siccome avevamo tante bande a disposizione, occorre calcolarci l'indice
+#cosa è un indice: montiamo le bande in un certo modo in modo per esempio che ci mostrino una componente del sistema importantissima che si chiama biomassa
+#ovvero la massa biologica che c'è in un sistema, ovviamente la massa può essere un orso così come un albero. Per misurare questa biomassa possiamo usare le immagini satellitari e calcolare degli indici
+#ci calcoliamo gli indici per le bande che abbiamo a disposizione
+#per esempio due bande molto interessanti sono: il vicino infrarosso, perché c'è questo tessuto che è il mesofillo fogliare, con le cellule a palizzata; poi c'è il rosso
+#il rosso viene assorbito praticamente del tutto (anche il blu in realtà, però si gioca con il rosso, poi vedremo il perché)
+#possiamo giocare su queste due informazioni, il rosso viene assorbito per far partire la catena di elettroni tra l'inizio della fotosintesi e il ciclo di Calvin, la biomassa è un parametro molto utilizzata
+#abbiamo le due bande: una è l'infrarosso mentre l'altra è il rosso, avremmo un pixel di infrarosso e lo stesso pixel nel rosso, e magari nello stesso pixel c'è un albero
+#se c'è un albero ammettiamo di avere un range di valori di riflettanza, la riflettanza è una divisione tra la radiazione che viene riflessa al numerazione / la radiazione incidente al denominatore
+#abbiamo questa riflettanza e andiamo a vedere la pianta come si comporta, ammettiamo di avere un range di riflettanza tra 0 e 100, 100 e il massimo di riflettanza e 0 è il minimo di riflettanza
+#a questo punto avremmo che la pianta nell'infrarosso, avrà una riflettanza nell'infrarosso elevata, circa 90 per es. Il rosso viene assorbito quasi del tutto, riflette pochissimo 
+#quindi avrà una riflettanza 10, una riflettanza molto bassa. Quindi mettiamo questa informazione in un indice, in un solo modello
+#basta fare una operazione matematica, può essere qualsiasi tipo di operazione es. 90-10 = un nuovo livello; per cui il valore di questo nuovo livello è 80
+#questo indice è una differenza, riguarda la vegetazione, quindi è un indice di vegetazione basato sulla differenza, infatti si chiama DIFFERENCE VEGETATION INDEX= DVI
+#attraverso questo indice possiamo calcolarci la biomassa di quel pixel
+#ora prendiamo un altro pixel che per es. non abbia vegetazione. Ammettiamo che ci sia una pianta che sta morendo o in generale una parte in cui la vegetazione non è più rigogliosa, es. c'è stato un taglio
+#si va a fare lo stesso calcolo, solo che in questo caso in una pianta che muore il mesofillo fogliare è basso, quindi non si hanno più le cellule a palizzata, sono aggrovigliate l'una sull'altra
+#l'infrarosso in questo caso viene riflesso molto meno, la riflettanza dell'infrarosso in questo caso sarà per es. 60; nel rosso, si ha un basso assorbimento ormai, la riflettanza sarà 430, aumenta, perchè non sarà più assorbita quella parte dello spettro del visibile
+#facendo la differenza 60-30= l'indice su questo pixel è 30; attraverso questo calcolo DVI, possiamo fare un calcolo della biomassa stimata in una certa area
+#potremmo usare anche il blu perchè pure il blu viene assorbito
+#in generale ci interessa usare il rosso per questo motivo-> FIRMA SPETTRALE, è una sorta di impronta digitale della luce nelle varie lunghezze d'onda. Una pianta ha sempre la firma digitale (vedere slide)
+#nella zona del blu c'è assorbimento, nella zona del verde c'è una più alta riflettanza, nel rosso c'è di nuovo assorbimento per poi andare nell'infrarosso
+#questa si chiama firma spettrale, oggi attraverso le firme spettrali è possibile riconoscere le singole specie
+#come si fanno le firme spettrali-> si prendono varie lunghezze d'onda: il blu, il verde, il rosso e l'infrarosso
+#con queste lunghezze d'onda misuro la riflettanza di una pianta, nel blu abbiamo un alto assorbimento, nel verde una alta riflettanza, nel rosso alto assorbimento e nell'infrarosso una altissima riflettanza
+#vedere slide
+#la zona tra il rosso e l'infrarosso si chiama red edge. Il red edge, edge significa bordo, è l'ultima parte vicino al rosso. Indica quanto la pianta è sana, se io ho la pendenza come la slide, la pendenza se è alta la pianta è sana
+#se la pendenza diminuisce la pianta starà soffrendo, per questo si usano per calcolare gli indici spettrali di vegetazione, l'infrarosso ed il rosso, perchè sono quelle contigue
+#possiamo ora fare questo calcolo insieme
+
+
+# spectral indices
+
+#indichiamo i pacchetti che ci servono
+library(imageRy)
+library(terra)
+
+#se volessimo andare su qualsiasi pagina on-line e premessimo control maiuscolo C, di qualsiasi pagina, ci viene fuori un oggetto che è il codice che sta regolando quella pagina e si chiama html
+#possiamo vedere con control maiuscolo C i commenti, che non sono pubblicati nella pagina
+
+#su imageRy su repositories abbiamo il manuale, la prima funzione che andiamo ad usare è: 
+# list of files:
+im.list()
+
+# importing data
+#facciamo importazione
+#l'immagine è stata presa dal sito Earth Observatory della NASA
+# https://visibleearth.nasa.gov/images/35891/deforestation-in-mato-grosso-brazil/35892l
+#importiamo l'immagine con im.import()
+m1992 <- im.import("matogrosso_l5_1992219_lrg.jpg")
+#parla della deforestazione di quest'area
+#c'è da capire come è stata creata quest'immagine, hanno creato una immagine in falso colore usando nir, red e green e l'hanno messa su internet
+#quindi abbiamo a disposizione 3 bande, dove la prima è l'infrarosso, la seconda è il rosso e la terza è il verde (false color)
+#ci segniamo questa informazione, così che sappiamo quali sono le tre bande
+# band 1 = nir = R
+# band 2 = red = G
+# band 3 = green = B
+#ora possiamo fare un po' di plot, cambiando la posizione dell'infrarosso
+#in imageRy c'è la funzione im.plotRGB(), scriviamo al sistema come importare l'immagine, nome e le componenti RGB
+
+im.plotRGB(m1992, 1, 2, 3)
+#nella componente red ci mettiamo l'infrarosso, nella componente green ci mettiamo il rosso, nella componente blu ci mettiamo il verde
+#tutta la parte rossa, nella banda n1, tutto quello che diventa rosso è vegetazione iniziale, come era nel 1992
+#un'altra composizione che possiamo fare è mettere l'infrarosso nella componente verde
+
+# Exercise: put the nir ontop of the G component
+im.plotRGB(m1992, 2, 1, 3)
+#in verde fluo abbiamo tutta la foresta, le parti rosa sono le zone di suolo nudo
+#per visualizzare meglio il suolo nudo, il giallo è la componente maggiormente visibile all'occhio nudo, mettiamo le bande in modo che il suolo nudo diventa giallo
+#succede quando il nir è sulla componente blu
+# nir ontop of the B component
+im.plotRGB(m1992, 2, 3, 1)
+#tutte le parti gialle è dove l'uomo ha interagito
+#l'infratosso assorbe tutto, solitamente l'acqua nell'infrarosso diventa nera
+
+# importing the 2006 image
+#stessa zona solo che dal 1992 passiamo al 2006
+
+m2006 <- im.import("matogrosso_ast_2006209_lrg.jpg")
+#importiamo così l'immagine
+#il satellite in questo caso è diverso si chiama aster=ast, ha tante bande, ha tutta la zona di infrarosso-> sia vicino che in quello medio e termico
+#possiamo mettere due immagini vicine con par()
+par(mfrow=c(1,2))
+im.plotRGB(m1992, 1, 2, 3)
+im.plotRGB(m2006, 1, 2, 3)
+#abbiamo il mato grosso nei due anni diversi, situazione distrutta nel 2006, deforestata
+#riprendiamo la situazione solo del 2006 quindi faccio dev.off()
+dev.off()
+# nir on the green component of RGB 
+#nir sulla componente verde
+im.plotRGB(m2006, 2, 1, 3)
+# nir on the blue component of RGB
+#nir sul blu
+im.plotRGB(m2006, 2, 3, 1)
+#mettiamo tutte le 6 immagini insieme
+# multiframe
+par(mfrow=c(2,3))
+#lo facciamo con due righe e 3 colonne
+im.plotRGB(m1992, 1, 2, 3) # nir on R 1992
+im.plotRGB(m1992, 2, 1, 3) # nir on G 1992
+im.plotRGB(m1992, 2, 3, 1) # nir on B 1992
+im.plotRGB(m2006, 1, 2, 3) # nir on R 2006
+im.plotRGB(m2006, 2, 1, 3) # nir on G 2006
+im.plotRGB(m2006, 2, 3, 1) # nir on B 2006
+#abbiamo il nir su tutte le bande
+
+#la riflettanza è una divisione tra la radiazione che viene riflessa e quella incidente al denominatore, quindi deve essere qualcosa che varia tra 0 e 1, in realtà varia tra 0 e 255
+#perché-> su github c'è la presentazione continuous_vs_discontinuous_monitoring.pdf
+#c'è la radiazione incidente del sole che arriva all'oggetto, al denominatore, al numeratore c'è la radiazione che viene riflessa, il range è tra 0 e 1, se riflette tutto-> la riflettanza è 1, se invece arriva la radiazione e la assorbe tutta-> 0
+#è tra 0 e 255 perchè ogni pixel hanno valori diversi da 0, quasi un milione di pixel per 3 bande-> 6 milioni di pixel con informazioni tutte diverse dalle altre, quindi avranno pesi diversi
+#i computer funzionano come sistema binario-> bit, sono le informazioni binarie, un bit corrisponde a due informazioni: o 0 o 1. Con 2 bit= 00,11,10,01 ho 4 informazioni, con 3 bit ho 8 informazioni ecc. 2 elevato alla
+#gran parte delle immagini sono immagini con 8 bit= 256; approssimiamo tutti i valori quindi tra 0 e 255, per questo una immagine satellitare di 8 bit va da 0 a 255
+#l'ESA, ha messo immagini a 16 bit= satellite sampling, le loro immagini variano da 0 a 65535, potenzialmente
+#questo concetto si chiama risoluzione radiometrica, ci sono 3 tipi di risoluzione: risoluzione spaziale, per cui la dimensione del pixel (es. 30 metri), 
+#risoluzione spettrale, quindi quante bande ho, quanto ho dello spettro elettromagentico
+# risoluzione radiometrica, ovvero quanti valori nella modificazione in bit stiamo usando
+
+
+#LEZIONE 6
+
+
+# vegetation indices
+
+library(imageRy)
+library(terra)
+
+im.list()
+
+im.import("matogrosso_l5_1992219_lrg.jpg" )
+#usiamo l'immagine mato grosso
+#NASA Earth Observatory
+#presa da questo sito della NASA
+#NASA Visible Earth si trovano le immagini gratuite
+#nome della immagine tra virgolette
+
+m1992 <- im.import("matogrosso_l5_1992219_lrg.jpg" )
+#Landsat Science: immagine preso da questo sito
+#hanno fatto l'immagine di un falso colore: 3 bande infrarosso, rosso e verde
+#hanno fatto false color
+
+# bands
+#band 1= NIR
+#band 2= RED 
+#band 3= GREEN
+
+#plotting the data
+im.plotRGB(m1992, r=1, g=2, b=3)
+#la banda n 1 è infrarosso vicino, tutto quello che diventa rosso è vegetazione
+#questa è la foresta pluviale come era nel 1992
+#nir on green
+im.plotRGB(m1992, 2, 1,3)
+#compare la parte verde fluo, parti rosa: suolo nudo
+#per visualizzare il suolo nudo si usa un montaggio delle bande in modo che il suolo nudo diventa giallo
+#il nir lo si sposta sul blu 
+im.plotRGB(m1992, 2, 3, 1)
+#cosa è successo nel 2006
+m2006 <- im.import("matogrosso_ast_2006209_lrg.jpg")
+#ASTER è un satellite più recente
+#con più bande, oltre all'infrarosso vicino anche quello medio e termico
+#in questa maniera ho importato l'immagine
+#possiamo mettere le due immagini una vicino all'altra con par()
+par(mfrow=c(1,2))
+im.plotRGB(m1992, 1, 2, 3)
+im.plotRGB(m2006, 1, 2, 3)
+
+dev.off()
+#chiudiamo tutto, il grafico, così che studiamo solo per il 2006
+#nir on top of green
+im.plotRGB(m2006, 2, 1, 3)
+#nir on top of blu
+im.plotRGB(m2006, 2, 3, 1)
+
+#possiamo vedere le sei immagini tutti insieme
+par(mfrow=c(2,3))
+#mettiamo tutte e 6 le immagini
+im.plotRGB(m1992, r=1, g=2, b=3) #1992 nir on red
+im.plotRGB(m1992, 2, 1, 3) #1992 nir on green
+im.plotRGB(m1992, 2, 3, 1) #1992 nir on blue
+im.plotRGB(m2006, 1, 2, 3) #2006 nir on red
+im.plotRGB(m2006, 2, 1, 3) #2006 nir on green
+im.plotRGB(m2006, 2, 3, 1) #nir on blue
+
+#posso fare il plot della prima barra, ovvero il nir 
+plot(m2006[[1]])
+#risoluzione radiometrica
+#3 risoluzioni: spaziale, spettrale (quante bande ho), radiometrica (quanti valori nella codificazione in beat stiamo usando)
+
+
+
+
+
+# build a multiframe with 1992 and 2006 images
+par(mfrow=c(1,2))
+im.plotRGB(m1992, r=2, g=3, b=1)
+im.plotRGB(m2006, r=2, g=3, b=1)
+
+# DVI = NIR - RED
+# bands: 1=NIR, 2=RED, 3=GREEN
+
+dvi1992 = m1992[[1]] - m1992[[2]]
+plot(dvi1992)
+
+cl <- colorRampPalette(c("darkblue", "yellow", "red", "black")) (100)
+plot(dvi1992, col=cl)
+
+# exercise: calculate dvi of 2006
+dvi2006 = m2006[[1]] - m2006[[2]]
+plot(dvi2006, col=cl)
+
+# NDVI
+ndvi1992 = (m1992[[1]] - m1992[[2]]) / (m1992[[1]] + m1992[[2]])
+ndvi1992 = dvi1992 / (m1992[[1]] + m1992[[2]])
+plot(ndvi1992, col=cl)
+
+# NDVI
+ndvi2006 = dvi2006 / (m2006[[1]] + m2006[[2]])
+plot(ndvi2006, col=cl)
+
+# par
+par(mfrow=c(1,2))
+plot(ndvi1992, col=cl)
+plot(ndvi2006, col=cl)
+
+clvir <- colorRampPalette(c("violet", "dark blue", "blue", "green", "yellow"))(100) # specifying a color scheme
+par(mfrow=c(1,2))
+plot(ndvi1992, col=clvir)
+plot(ndvi2006, col=clvir)
+
+# speediing up calculation
+ndvi2006a <- im.ndvi(m2006, 1, 2)
+plot(ndvi2006a, col=cl)
+
+
+
+
+#vegetation indices
+#nell'infrarosso abbiamo tanta riflettanza, nel rosso abbiamo tanto assorbimento
+#nell'infrarosso riflette a causa del mesofillo fogliare, nel rosso assorbe tramite la fotosintesi
+#indice altissimo se c'è vegetazione, bassissimo se non c'è vegetazione
+
+# vegetation indices
+
+library(imageRy)
+library(terra)
+
+im.list()
+
+# importing data
+# https://visibleearth.nasa.gov/images/35891/deforestation-in-mato-grosso-brazil/35892l
+m1992 <- im.import("matogrosso_l5_1992219_lrg.jpg")
+  
+# bands: 1=NIR, 2=RED, 3=GREEN
+im.plotRGB(m1992, r=1, g=2, b=3)
+im.plotRGB(m1992, 1, 2, 3)
+im.plotRGB(m1992, r=2, g=1, b=3)
+im.plotRGB(m1992, r=2, g=3, b=1)
+
+# import the recent image
+m2006 <- im.import("matogrosso_ast_2006209_lrg.jpg")
+im.plotRGB(m2006, r=2, g=3, b=1)
+
+# build a multiframe with 1992 and 2006 images
+par(mfrow=c(1,2))
+im.plotRGB(m1992, r=2, g=3, b=1)
+im.plotRGB(m2006, r=2, g=3, b=1)
+
+# DVI = NIR - RED
+# bands: 1=NIR, 2=RED, 3=GREEN
+
+dvi1992 = m1992[[1]] - m1992[[2]]
+plot(dvi1992)
+
+cl <- colorRampPalette(c("darkblue", "yellow", "red", "black")) (100)
+plot(dvi1992, col=cl)
+
+# exercise: calculate dvi of 2006
+dvi2006 = m2006[[1]] - m2006[[2]]
+plot(dvi2006, col=cl)
+
+# NDVI
+ndvi1992 = (m1992[[1]] - m1992[[2]]) / (m1992[[1]] + m1992[[2]])
+ndvi1992 = dvi1992 / (m1992[[1]] + m1992[[2]])
+plot(ndvi1992, col=cl)
+
+# NDVI
+ndvi2006 = dvi2006 / (m2006[[1]] + m2006[[2]])
+plot(ndvi2006, col=cl)
+
+# par
+par(mfrow=c(1,2))
+plot(ndvi1992, col=cl)
+plot(ndvi2006, col=cl)
+
+clvir <- colorRampPalette(c("violet", "dark blue", "blue", "green", "yellow"))(100) # specifying a color scheme
+par(mfrow=c(1,2))
+plot(ndvi1992, col=clvir)
+plot(ndvi2006, col=clvir)
+
+# speediing up calculation
+ndvi2006a <- im.ndvi(m2006, 1, 2)
+plot(ndvi2006a, col=cl)
+
+
+
+#calcoliamo l'indice: calculating the DVI (Difference Vegetation Index)
+dvi1992 =
+#è una operazione matematica, prendiamo ogni singolo pixel di una banda, NI (infrared) e facciamo la sottrazione con i pixel della banda del rosso
+#DVI sono pixel che se presenta vegetazione ha un valore piuttosto ampio
+#8 bit sono 256 valori possibili
+#se il near infrared ha il valore massimo (255) e il rosso ha un valore minimo (0) avrò 255 come valore dell'indice
+#se invece NI ha valore minimo (0) e rosso massimo (255) allora l'indice sarà -255
+#il valore di questo indice varia da -255 a 255; l'indice è fortemente dipendente dalla risoluzione radiometrica in entrata
+dvi1992 = m1992[[1]]- m1992[[2]]
+#banda 1=nir
+#banda 2= red
+dvi1992= m1992$matogrosso_l5_1992219_lrg_1 - m1992$matogrosso_l5_1992219_lrg_2
+#posso scrivere anche così con il dollaro e ci lego la prima e seconda barra con tutto il suo nome
+#alternative way of coding
+
+#plotting the DVI
+cl <- colorRampPalette(c("darkblue", "yellow", "red", "black")) (100)
+plot(dvi1992, col=cl)
+
+#overleaf=per scrivere la tesi
+#viridis packages
+##facciamo la stessa operazione calcolandoci la DVI del 2006
+#bisogna importare l'immagine
+#im.import()
+m2006<-im.import("matogrosso_ast_2006209_lrg.jpg")
+dvi2006= m2006[[1]]- m2006[[2]]
+plot(dvi2006, col=cl)
+#giallo rappresenta una perdita della foresta
+#il giallo è una delle radiazioni che si vedono di più
+
+#esercizio
+#plot the dvi1992 beside the dvi2006
+par(mfrow=c(1,2))
+plot(dvi1992, col=cl)
+plot(dvi2006, col=cl)
+#ogni mappa rappresenta la biomassa presente in quel periodo
+#viene fuori una immagine che va da -255 a 255 perché è una immagine a 8 bit
+#se io avessi una immagine di 4 bit ho 16 valori possibili: NI da 0 a 15; RED da 0 15 quindi ho valori compresi tra -15 e 15 (range)
+#se io ho scaricato due immagini di bit diversi non sono comparabili
+#come si fa? si cambia indice
+#si crea un altro indice:  facciamo uan normalizzazione NDVI
+#divido per la loro somma, ma posso dividere anche per il massimo
+#il massimo NDVI è uguale a 1 (massimo NI minimo RED)
+#se ho il minimo NIR e massimo RED ho -1
+#quindi Normalized Difference Vegetation Index mi varia tra -1 e 1
+#faccio la stessa cosa per l'immagine a 4 bit
+#anche in questo caso l'NDVI, quindi il DVI normalizzato, varia tra -1 e 1
+#è un indice che non ha nessun rapporto con la risoluzione radiometrica
+#calcoliamo l'NDVI
+#Normalised Difference Vegetation Index
+# è un DVI diviso per la somma del primo e seconda banda
+ndvi1992 = dvi1992 / (m1992[[1]]+m1992[[2]])
+ndvi2006 = dvi2006/ (m2006[[1]]+m2006[[2]])
+ndvi1992
+ndvi2006
+#i range che vediamo sono da -1 a 1
+dev.off()
+par(mfrow=c(1,2))
+plot(ndvi1992, col=cl)
+plot(ndvi2006, col=cl)
+#abbiamo calcolato gli indici spettrali
+
+# speediing up calculation
+ndvi2006a <- im.ndvi(m2006, 1, 2)
+plot(ndvi2006a, col=cl)
+#NDVI fatto con imageRy, funzione che si trova all'interno del pacchetto, al posto di fare tutto il calcolo
+#si scrive il nome dell'immagine e le immagini che rappresentano il NIR ed il RED
 
 
