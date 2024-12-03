@@ -830,7 +830,11 @@ plot(ndvi2006a, col=cl)
 #prossima lezione vedremo gli istogramma, le differenza tra immagini o classificazione per quantificare-> es. come si fa a quantificare la percentuale di foresta persa
 
 
-#LEZIONE 7 08.04
+#LEZIONE 7 09.04
+#quindi la domanda magari che ci possiamo fare è quanta foresta è stata persa
+
+
+
 
 
 
