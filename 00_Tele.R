@@ -831,7 +831,263 @@ plot(ndvi2006a, col=cl)
 
 
 #LEZIONE 7 09.04
-#quindi la domanda magari che ci possiamo fare è quanta foresta è stata persa
+#quindi la domanda magari che ci possiamo fare è come facciamo a quantificare la quantità di foresta che abbiamo perso nella nostra area, dal 1992 al 2006
+#c'è un modo per quantificare? Le cose che si possono fare sono praticamente due, da un lato fare una classificazione
+#per cui prendere una immagine, spiegare al sistema attraverso l'IA, machine learning, chiediamo al sistema quali sono le due classi che ci interessano, per cui in questo caso vegetazione e suolo nudo
+#in questo modo classifichiamo l'immagine e tiriamo fuori queste quantità, quindi la proporzione delle due classi
+#oppure facciamo la differenza tra gli indici che abbiamo calcolato nei due istanti diversi
+#questi sono i due metodi: primo metodo è la classificazione basata sui dati continui di riflettanza arrivando a delle classi, nel secondo metodo manteniamo i dati continui del DVI, cioè dell'indice, e facciamo la sottrazione, questo lo faremo la prox volta
+#oggi faremo una classificazione
+#CLASSIFICAZIONE
+#classification
+# abbiamo una immagine satellitare continua (abbiamo montato le bande)
+# presenta una zona a carattere nevoso, la zona verde, poi si ha la parte blu che sono le praterie ad alta quota, poi c'è il bosco misto, conifere e latifoglie, parte verde scuro, la parte vuola è la parte urbana
+#cosa possiamo fare per insegnare al sistema che cosa è una certa classe
+#selezioniamo dei pixel casuali all'interno delle nostre aree, questi per es. 3 pixel nella parte verde, vediamo che in uno spazio composto dalle bande (PC=Principal Components) abbiamo la riflettanza di ogni pixel rappresentata dal punto nelle tre bande
+#per es. si ha una bassa riflettanza nella prima banda, una alta riflettanza nella seconda e una altra riflettanza bassa nella terza
+#dopodiché prendiamo un altro pixel che sarà vicino a quello precedente avendo più o meno la stessa riflettanza, essendo quel pixel della stessa classe
+#prendiamo altri 3 pixel per la classe blu e vediamo come si distribuiscono all'interno dello spazio delle bande, poi facciamo per quello verde e poi facciamo quello viola
+
+#lo scopo è creare i training sites, i siti di prova, per far capire all'algoritmo cosa intendiamo per le nostre classi
+#vediamo per es. il pixel di vegetazione e come si può comportare nello spazio spettrale
+#vediamo il pixel come si comporta nello spazio spettrale, come sono distribuiti
+#es. pixel della pianta-> alta riflettanza nel NIR, bassa nel rosso.
+#abbiamo individuato dei gruppi: i gruppi nel linguaggio statistico si chiamano CLUSTER
+#un cluster è un insieme, un gruppo, per cui in questo caso abbiamo un cluster di suolo nudo, e un cluster della vegetazione, per cui 2 gruppi
+#abbiamo codificato quelli che si chiamano training sites: pixel presi all'inizio in modo casuale che ci permettono di distinguere i gruppi
+#ipotizziamo che vogliamo fare una classificazione di un pixel, non è entrato nei training sites, vogliamo fare una classificazione di questo pixel
+#a quale cluster appartiene questo pixel? quale è la probabilità che appartiene ad un cluster rispetto che all'altro?
+#possiamo fare la media di questi 3 valori, sulla x e sulla y-> facciamo le means=medie, e andiamo a calcolare la la distanza del pixel incognito a quelli che so. Distanza si intende come k
+#la distanza possiamo vedere che ha la seconda distanza molto più alta rispetto che alla prima, per cui quel pixel ha una probabilità più alta nell'appartenere al cluster della vegetazione
+#l'algoritmo si chiama k-means: mi classifica ogni singolo pixel dell'immagine originale basandosi su dei cluster fatti in origine chiamati training sites. Dalla base dei training sites avviene la classificazione
+#quindi prendo l'immagine originale, faccio i cluster e poi creo in uscita una nuova immagine, una mappa, con le parti di foresta e con le parti di suolo nudo, è una mappa classificata
+#la mappa classificata mi serve perchè posso calcolare la frequenza, cioè il numero di pixel nella foresta ed il numero di pixel nel suolo nudo, vedo come varia il numero di pixel nelle due classi nel tempo. 
+
+#1° si parte dall'immagine satellitare
+#2° classificheremo l'immagine
+#3° grafici statistici per vedere quale è stata la variazione di queste classi
+
+
+# quantifying land cover variability: copertura del suolo.
+#land cover= si chiama così questo tipo di mappa, la copertura del suolo
+
+#dobbiamo installare due pacchetti
+
+install.packages("ggplot2")
+#usiamo le virgolette perché usciamo da R
+install.packages("patchwork")
+#con la funzione library() richiamiamo il pacchetto 
+
+library(terra)
+library(imageRy)
+library(ggplot2)
+library(patchwork)
+
+detach("package:patchwork", unload = TRUE)
+#ho levato patchwork perchè mi nascondeva il pacchetto terra (mi usciva un warning)
+# Listing images
+#imageRy-> lista delle immagini
+#listing images
+im.list()
+#importo l'immagine 
+# Importing data
+m1992<- im.import("matogrosso_l5_1992219_lrg.jpg")
+#la andiamo ora a classificare
+#prima di classificare il mato grosso importiamo anche l'immagine del sole
+sun <- im.import("Solar_Orbiter_s_first_views_of_the_Sun_pillars.jpg")
+#Solar Orbites è un satellite che sta prendendo immagini dal sole
+#immaginiamo qua avere 3 livelli energetici, quello giallo è il livello energetico più alto, marrone è il livello energetico intermedio e quello nero è il livello energetico più basso
+#andiamo ora a fare la CLASSIFICAZIONE di questa immagine su questi tre livelli energetici
+#lo si fa con la funzione im.classify() -> è una funzione di imageRy
+#richiede il nome dell'immagine principale, e poi c'è un argomento della funzione che si chiama num_cluster ovvero number of clusters, quanti gruppi ci sono secondo noi nell'immagine, quanti cluster
+# classifying images
+sunc <- im.classify(sun, num_clusters=3)
+#classifichiamo l'immagine sui tre livelli energetici
+#è una classificazione non supervisionata, fa tutto l'IA, dobbiamo solo dire il numero delle classi che secondo noi sono presenti
+#crea già automatico un plot, che viene fuori dalla classificazione
+#ognuno dei nostri computer, l'algoritmo, ha selezionato dei pixel randomicamente, ed ha iniziato da quella classe lì, per cui i colori di ogni mappa possono essere tranquillamente diversi da computer a computer
+#l'algoritmo ha iniziato da quei pixel lì in maniera randomica, può partire sempre da un punto diverso per fare la classificazione
+#di che classi stiamo parlando: 3 livelli energetici, giallo, intermedio e più basso
+#la prima classe ha raggruppato tutti i pixel che almeno in questo caso, li ha raggruppati del livello energetico più basso
+#la seconda classe sono livelli intermedi (in questo caso, perché il computer prende in maniera casuale)
+#la terza classe livello superiore energetico
+# https://www.esa.int/ESA_Multimedia/Images/2020/07/Solar_Orbiter_s_first_views_of_the_Sun6
+# additional images: https://webbtelescope.org/contents/media/videos/1102-Video?Tag=Nebulas&page=1
+
+#possiamo ora lavorare sull'immagine del matogrosso
+# importing Mato grosso images
+m1992 <- im.import("matogrosso_l5_1992219_lrg.jpg")
+m2006 <- im.import("matogrosso_ast_2006209_lrg.jpg")
+#importo sia l'immagine del 1992 sia quella del 2006
+
+#si procede con la classificazione di queste immagini
+# classifying images
+m1992c <- im.classify(m1992, num_clusters=2)
+#nome dell'immagine, il numero dei clusters-> identificazione tra foresta e tutto il resto, quindi solo 2
+#ci crea una mappa in cui nel mio caso la classe n1 è il suolo nudo
+#mentre la classe n2 è la foresta
+
+#quindi posso scrivere un commento del genere
+# 1992
+# class 1 = human
+# class 2 = forest
+
+#in questo modo ho definito e so che nel mio caso, la classe n1 è suolo nudo.
+
+#classifichiamo ora anche l'immagine del 2006
+
+m2006c <- im.classify(m2006, num_clusters=2)
+#rimangono gli stessi colori per le classi, in questo caso
+
+# 2006
+# class 1 = human
+# class 2 = forest
+
+#il prossimo passaggio, dopo aver classificato l'immagine
+# se mettiamo il nome dell'immagine su R
+m2006c
+#vediamo che abbiamo solo due valori: 1 e 2
+#vogliamo calcolare il n di pixel, in statistica si chiama FREQUENZA, di una certa classe, della foresta contro il numero di pixel del suolo nudo
+#questi si chiamano frequenze, grazie alle frequenze tireremo fuori poi le percentuali delle due classi
+
+#per essere sicure delle nostre classi facciamo 
+plot(m1992c)
+#abbiamo diversi colori, controlliamo il colore e così siamo sicuri delle classi
+plot(m2006c)
+#per vedere se combaciano i colori con le classi
+
+#ora vogliamo calcolare il numero di pixel per ogni classe
+#basta calcolare quella che si chiama frequenza
+#calculating frequencies
+#una frequenza misura il n di oggetti rispetto all'intero, dopodiché con la frequenza si possono calcolare le proporzioni e poi le percentuali
+# frequencies
+#la funzione è freq()
+f1992 <- freq(m1992c)
+f1992
+#nella tabellina che esce 
+#1 e 2 significa le righe, i valori 1 e 2, poi count ovvero la conta, la conta dei pixel appartenenti alla classe 1 e dei pixel appartenenti alla classe 2
+> f1992
+  layer value   count
+1     1     1  304437
+2     1     2 1495563
+#abbiamo 1 milione di pixel appartenenti alla classe 1 e 300 mila pixel appartenenti alla classe 2 
+#qui la foresta è altamente dominante.
+#da qui possiamo calcolarci la proporzione
+#la PROPORZIONE è il numero di pixel di una classe rispetto al totale
+
+# proportions
+#come si fa a sapere il totale
+# c'è la funzione che è ncell()
+tot1992 <- ncell(m1992c)
+> tot1992
+[1] 1800000
+#un milione e 800 mila pixel
+#come si calcola la proporzione
+# proportions
+tot1992 <- ncell(m1992c)
+#la proporzione è la frequenza diviso il totale
+prop1992 = f1992 / tot1992
+>prop1992
+layer        value     count
+1 5.555556e-07 5.555556e-07 0.1691317
+2 5.555556e-07 1.111111e-06 0.8308683
+#siccome è una operazione posso anche scrivere l'=
+#è una funzione matematica al posto di assegnazione posso mettere l'uguale
+#prendiamo solo la colonna count: 0.83 per le foreste, 0.16 per il suolo nudo
+
+#posso calcolare anche la percentuale
+# percentages
+perc1992 = prop1992 * 100
+#basta moltiplicare la proporzione per 100
+perc1992
+#abbiamo l'83% di foresta
+#in count vediamo che abbiamo l'83% di foresta e il 17% di suolo nudo
+
+# 17% human, 83% forest
+#questi dati ce li scriviamo perché mi servono dopo per creare un dataset
+
+
+#facciamo le frequenze per il 2006
+# frequencies
+f2006 <- freq(m2006c)
+
+# proportions
+tot2006 <- ncell(m2006c)
+#il totale c'è da calcolarlo anche per il 2006, perchè non è detto che sono gli stessi pixel per due immagini diverse
+#infatti in questa immagine è 72 milioni il totale
+prop2006 = f2006 / tot2006
+
+# percentages
+perc2006 = prop2006 * 100
+
+# 1992: 17% human, 83% forest
+# 2006: 55% human, 45% forest
+
+#abbiamo i dati, a questo punto ci costruiamo un dataset e tirare fuori dei grafici da questo dataset
+#si fa con la funzione data.frame()
+#in R le tabelle si chiamano dataframe, la funzione data.frame() crea un dataframe del vettore
+# let's build a dataframe, facciamo una tabellina
+#in cui mettiamo la classe su una colonna, la percentuale del 1992 su un'altra colonna, e la percentuale del 2006 su un'altra colonna
+#ci costruiamo una tabella con 2 classi e 2 valori
+#le classi saranno forest e human, avremo i valori del 1992 e del 2006, quindi per prima cosa c'è da creare le due colonne
+# let's build a dataframe
+class <- c("forest", "human")
+p1992 <- c(83, 17)
+p2006 <- c(45, 55)
+#prima colonna è la classe, che corrisponde a due classi-> forest e human: sono due elementi di un vettore, array, e sono un testo, tutte le parti di testo nelle tabelle vengono messe tra virgolette
+class <- c("forest", "human")
+#la percentuale 1992 su un'altra colonna, così come per 2006
+#numeri: due elementi di un vettore, numeri non vanno tra virgolette
+
+#abbiamo le tre colonne
+#creo la tabella con la funzione data.frame() mettendo le tre colonne
+tabout <- data.frame(class, p1992, p2006)
+tabout
+class p1992 p2006
+1 forest    83    45
+2  human    17    55
+#per vederla proprio come tabella
+View(tabout)
+#la lettera V è maiuscola
+#abbiamo quindi 2 righe e 3 colonne
+#andiamo a fare il grafico usando ggplot()
+
+# plotting the output
+#funzione ggplot() per creare dei grafici
+#devo mettere il nome della tabella che sto usando; aes=aestetics= estetica del grafico, la struttura
+#asse x metto foresta e human, nell'asse y metto le percentuali. aes del grafico, sulla x metto le classi, la y è uguale alla percentuale del 1992; il colore color, lo differenziamo tra le due classi
+#a questo punto dobbiamo decidere il grafico da fare, con ggplot aggiungiamo pezzi di un'altra funzione
+#la funzione è il tipo di geometria: geom_bar() quindi istogrammi; gli argomenti sono il tipo di statistica che vogliamo usare
+#"identity" la statistica è il valore esatto come ce lo abbiamo, non dobbiamo calcolarlo; il colore con il quale vogliamo riempire gli istogrammi fill="white"
+ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white")
+ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
+#parte umana super le foreste che sono in declino
+
+#si possono mettere insieme i due istogrammi
+#abbiamo prima installato il pacchetto patchwork
+#lo richiamo con library(patchwork)
+# patchwork
+#mette insieme più grafici
+#prende il primo grafico e lo assegna ad un oggetto, così come il secondo, poi con il + lo mette uno vicino all'altro
+#assegnamo ad ognuno dei due grafici, li assegnamo ad un oggetto
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white")
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
+p1 + p2
+
+#grafico sbagliato perché la scala tra i due grafici è diversa
+#come ovviare il problema: basta mettere gli assi uguali
+#la funzione è ylim()
+#ci vuole la c perché sono due elementi del vettore
+#questa è proprio una funzione che si chiama ylim()
+# varying axis and using lines
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
+p1 + p2
+#se volessimo diminuire il range lo possiamo fare, metterlo anche a 90 -> ylim(c(0,90))
+#l'importante è che abbiano lo stesso range
+p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
+p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
+p1 + p2
 
 
 
