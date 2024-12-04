@@ -1051,22 +1051,36 @@ View(tabout)
 #la lettera V è maiuscola
 #abbiamo quindi 2 righe e 3 colonne
 #andiamo a fare il grafico usando ggplot()
-
+#il pacchetto è ggplot2() già installato, con la funzione ggplot()
 # plotting the output
 #funzione ggplot() per creare dei grafici
-#devo mettere il nome della tabella che sto usando; aes=aestetics= estetica del grafico, la struttura
-#asse x metto foresta e human, nell'asse y metto le percentuali. aes del grafico, sulla x metto le classi, la y è uguale alla percentuale del 1992; il colore color, lo differenziamo tra le due classi
-#a questo punto dobbiamo decidere il grafico da fare, con ggplot aggiungiamo pezzi di un'altra funzione
-#la funzione è il tipo di geometria: geom_bar() quindi istogrammi; gli argomenti sono il tipo di statistica che vogliamo usare
+#devo mettere il nome della tabella che sto usando, in questo caso "tabout"; aes=aestetics= estetica del grafico, la struttura
+#asse x metto foresta e human, nell'asse y metto le percentuali. per l'aestetics, aes del grafico, sulla x metto le classi, la y è uguale alla percentuale del 1992; il colore color, lo differenziamo tra le due classi
+#quindi prima farò il grafico della immagine del 1992 e poi farò il grafico dell'immagine del 2006
+#le percentuali per questo grafico le scriverò così
+y1992 <- c(83, 17)
+y2006 <- c(45, 55)
+ggplot(tabout, aes(x=class, y=y1992, color=class))
+ggplot(tabout, aes(x=class, y=y2006, color=class))
+#non mi da ancora niente all'interno del grafico
+#a questo punto dobbiamo decidere il grafico da fare, con ggplot, su ggplot2 possiamo aggiungere pezzi di un'altra funzione
+#in questo caso la funzione è il tipo di geometria: geom_bar() quindi istogrammi; gli argomenti sono il tipo di statistica che vogliamo usare
+#es. voglio estrarre la media da un campione e rappresentarla come istogramma, in quel caso stat=average, che sta per media; oppure mediana, deviazione standard ecc
+#nel nostro caso però non dobbiamo estrarre la statistica, abbiamo già il valore 
 #"identity" la statistica è il valore esatto come ce lo abbiamo, non dobbiamo calcolarlo; il colore con il quale vogliamo riempire gli istogrammi fill="white"
+# plotting the output
 ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white")
+#abbiamo così il nostro ISTOGRAMMA, con foresta da un lato e human dall'altro
+#si vede in questo caso la dominanza delle foreste, con un 83%
+#facciamo anche per il 2006
 ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
-#parte umana super le foreste che sono in declino
+#parte umana supera le foreste che sono in declino
 
-#si possono mettere insieme i due istogrammi
+#si possono mettere insieme i due istogrammi, si possono mettere i due grafici del 1992 e del 2006
 #abbiamo prima installato il pacchetto patchwork
-#lo richiamo con library(patchwork)
 # patchwork
+#lo richiamo con library(patchwork)
+library(patchwork)
 #mette insieme più grafici
 #prende il primo grafico e lo assegna ad un oggetto, così come il secondo, poi con il + lo mette uno vicino all'altro
 #assegnamo ad ognuno dei due grafici, li assegnamo ad un oggetto
@@ -1074,22 +1088,26 @@ p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identi
 p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white")
 p1 + p2
 
-#grafico sbagliato perché la scala tra i due grafici è diversa
+#grafico sbagliato perché la scala tra i due grafici è diversa->> ERRORE GRAVISSIMO
 #come ovviare il problema: basta mettere gli assi uguali
 #la funzione è ylim()
-#ci vuole la c perché sono due elementi del vettore
+#ci vuole la c perché sono due elementi del vettore, ricordandoci la doppia parentesi
 #questa è proprio una funzione che si chiama ylim()
 # varying axis and using lines
 p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
 p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,100))
 p1 + p2
-#se volessimo diminuire il range lo possiamo fare, metterlo anche a 90 -> ylim(c(0,90))
+#in fondo ai due grafici facciamo +ylim() ovvero il limite della y, che va da 0 a 100. Perché sono percentuali
+#abbiamo due grafici ora completamente diversi, vediamo nel primo grafico aumento di foresta mentre nel secondo grafico diminuzione di foresta e aumento di human
+#se volessimo diminuire il range lo possiamo fare, metterlo anche a 90 -> ylim(c(0,90)), tanto il nostro massimo valore è 83
 #l'importante è che abbiano lo stesso range
 p1 <- ggplot(tabout, aes(x=class, y=y1992, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
 p2 <- ggplot(tabout, aes(x=class, y=y2006, color=class)) + geom_bar(stat="identity", fill="white") + ylim(c(0,90))
 p1 + p2
+#la prossima lezione sarà dedicata all'altro metodo per misurare e quantificare la variazione di due mappe, facendo la sottrazione tra di loro
 
 
+#LEZIONE 8 
 
 
 
