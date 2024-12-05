@@ -1107,7 +1107,231 @@ p1 + p2
 #la prossima lezione sarà dedicata all'altro metodo per misurare e quantificare la variazione di due mappe, facendo la sottrazione tra di loro
 
 
-#LEZIONE 8 
+#LEZIONE 8 11/04/2024
+# time series analysis
+#analisi delle serie temporali in R è lo studio di dati raccolti in ordine temporale per identificare modelli, trend, stagionalità e altre caratteristiche significative nel tempo.
+
+library(imageRy)
+library(terra)
+
+im.list()
+
+# import the data
+#importo i dati
+EN01 <- im.import("EN_01.png")
+EN13 <- im.import("EN_13.png")
+#importando queste immagini però ho un grafico sottosopra
+#certe volte le immagini l'immagine potrebbe essere visualizzata "sottosopra" a causa del modo in cui le coordinate dei pixel vengono interpretate (origine in alto a sinistra rispetto al sistema cartesiano).
+# l'immagine potrebbe apparire "sottosopra" (a causa dell'orientamento delle coordinate Y tipico delle immagini raster geospaziali).
+#la funzione flip() di terra permette di invertire le righe o le colonne di un raster. 
+#Aggiungendo questa operazione, possiamo ribaltare l'immagine lungo l'asse Y e risolvere il problema.
+#la direzione mi specifica che l'operazione di flip deve essere applicata lungo l'asse verticale, cioè l'immagine viene ribaltata "dall'alto verso il basso"
+EN01rib <- flip (EN01, direction= "vertical")
+EN13rib <- flip (EN13, direction = "vertical") 
+#Dopodiché per visualizzare le nuove immagini ribaltate dobbiamo fare plot(), le dobbiamo plottare
+plot(EN01rib)
+plot(EN13rib)
+#possiamo mettere tutte e due le immagini nello stesso dataframe attraverso par(), con 2 righe ed 1 colonna
+par(mfrow=c(2,1))
+im.plotRGB.auto(EN01rib)
+im.plotRGB.auto(EN13rib)
+#è progettata per semplificare la visualizzazione di immagini multispettrali o raster in formato RGB (rosso, verde, blu). 
+#È una funzione utile per lavorare con immagini geospaziali, come dati satellitari (ad esempio, Sentinel o Landsat) o immagini che contengono più bande spettrali.
+#se non vengono specificate, questa funzione seleziona automaticamente le bande del rosso, blu e verde
+#la funzione può determinare automaticamente una configurazione ottimale basata sulle caratteristiche dell'immagine.
+#Applica automaticamente un stretching lineare o una normalizzazione ai valori delle bande, migliorando la qualità visiva dell'immagine.
+#Ti permette di esplorare rapidamente immagini multispettrali scegliendo una combinazione di bande adatte per evidenziare determinate caratteristiche (es. vegetazione, acqua, suolo).
+
+# using the first element (band) of images
+#con le parentesi quadre prendo solo il primo elemento della immagine
+dif = EN01rib[[1]] - EN13rib[[1]]
+#colors RGB  : 1, 2, 3, la prima banda è quella del rosso, quindi è quella in cui mi appare il rosso
+#questa immagine rappresenta quanta è la concentrazione di diossido di azoto nella colonna della troposfera (lo strato più basso dell'atmosfera)
+#in rosso abbiamo le aree con maggiore concentrazione di diossido di azoto
+#con dif = abbiamo fatto la differenza tra l'immagine EN01 che rappresenta la concentrazione durante il periodo di Gennaio - EN13 che è la concentrazione in Marzo
+
+# palette
+dev.off()
+cldif <- colorRampPalette(c("blue", "white", "red")) (100)
+plot(dif, col=cldif)
+#rendiamolo visibile con un grafico la differenza in concentrazione tra Gennaio e Marzo
+
+### New example: temperature in Greenland
+
+g2000 <- im.import("greenland.2000.tif")
+clg <- colorRampPalette(c("black", "blue", "white", "red")) (100)
+plot(g2000, col=clg)
+
+g2005 <- im.import("greenland.2005.tif")
+g2010 <- im.import("greenland.2010.tif")
+g2015 <- im.import("greenland.2015.tif")
+
+plot(g2015, col=clg)
+
+par(mfrow=c(1,2))
+plot(g2000, col=clg)
+plot(g2015, col=clg)
+
+# stacking the data
+#combinazione di più oggetti raster (come immagini o dati geospaziali) in un unico oggetto stack. 
+stackg <- c(g2000, g2005, g2010, g2015)
+plot(stackg, col=clg)
+#ho creato un raster stack che contiene quattro layer temporali (anni 2000, 2005, 2010, 2015) e poi visualizzando i dati.
+#Se ho dati raccolti in periodi diversi (es. copertura del suolo in anni diversi) o in bande spettrali diverse, uno stack consente di lavorare con questi dati come un unico oggetto coerente.
+# Exercise: make the difference between the first and the final elements of the stack
+#la differenza mi permette di calcolarmi le variazioni tra anni diversi, per cui tra il primo elemento dello stack con il quarto che corrisponde alla immagine dell'anno 2000 e 2015
+difg <- stackg[[1]] - stackg[[4]]
+# difg <- g2000 - g2015
+plot(difg, col=cldif)
+# stackg[[1]] - stackg[[4]]: Calcola la differenza pixel per pixel tra il layer per l'anno 2000 e quello per l'anno 2015.
+#Il risultato è un nuovo raster in cui ogni valore rappresenta la variazione tra i due layer in corrispondenza di ciascuna cella spaziale.
+#il plot() Visualizza la mappa della differenza utilizzando una palette di colori specificata da cldif. 
+#Questo consente di vedere visivamente le aree in cui ci sono state variazioni positive, negative o nulle.
+
+# Exercise: make a RGB plot using different years
+im.plotRGB(stackg, r=1, g=2, b=3)
+#sto specificando quali bande utilizzare per creare un'immagine RGB a partire dallo stack di raster che ho creato.
+#per il colore rosso sto dicendo di usare la priam banda ovvero l'anno 2000
+#per il colore verde sto dicendo di usare la seconda banda ovvero l'anno 2005
+#per il colore blu sto dicendo di usare la terza banda per cui l'anno 2010
+#Ogni pixel dell'immagine risultante avrà un valore di colore che dipende dai valori nelle bande selezionate per ogni anno (2000, 2005, 2010):
+#Il valore della banda 2000 (prima banda) sarà usato per il canale rosso.
+#Il valore della banda 2005 (seconda banda) sarà usato per il canale verde.
+#Il valore della banda 2010 (terza banda) sarà usato per il canale blu.
+#Se sto lavorando con un'immagine che rappresenta una variabile ambientale per ciascun anno, la combinazione dei colori in RGB ti permette di vedere:
+#Rosso (Red): Come cambia la variabile nel 2000.
+#Verde (Green): Come cambia la variabile nel 2005.
+#Blu (Blue): Come cambia la variabile nel 2010
+#Se le variazioni tra gli anni sono marcate, vedrò aree con colori distinti per rappresentare quelle differenze.
+#Ad esempio, aree che sono rosse potrebbero indicare che nel 2000 c'era un valore alto in quella zona, ma potrebbe essere verde o blu negli altri anni, a seconda dei cambiamenti.
+
+
+# Second method to quantify changes in time 
+# The first method was based on classification
+
+library(imageRy)
+library(terra)
+
+im.list()
+
+# importing data
+EN01 <- im.import("EN_01.png")
+EN13 <- im.import("EN_13.png")
+
+par(mfrow=c(2,1))
+im.plotRGB.auto(EN01)
+im.plotRGB.auto(EN13)
+
+difEN = EN01[[1]] - EN13[[1]]
+cl <- colorRampPalette(c("blue","white","red")) (100)
+plot(difEN, col=cl)
+
+## Ice melt in Greenland
+#la quantità di ghiaccio sciolto in Groenlandia durante gli anni (2000, 2005, 2010, 2015),
+#osserveremo i cambiamenti nel ghiaccio sciolto nel tempo, identificando dove e quanto è cambiato.
+g2000 <- im.import("greenland.2000.tif")
+clg <- colorRampPalette(c("black","blue","white","red")) (100)
+plot(g2000, col=clg)
+#I valori più bassi (meno ghiaccio sciolto) sono rappresentati dal nero e dal blu scuro, mentre i valori più alti (più ghiaccio sciolto) sono rappresentati dal bianco e rosso.
+#n questa mappa vedo la distribuzione dello scioglimento del ghiaccio nel 2000. Le aree più rosse indicano che c'è stato un grande scioglimento del ghiaccio in quelle zone.
+
+g2005 <- im.import("greenland.2005.tif")
+g2010 <- im.import("greenland.2010.tif")
+g2015 <- im.import("greenland.2015.tif")
+#Importi i dati per gli anni 2005, 2010 e 2015
+#visualizzo le immagini per 2000 e 2015 in una griglia di due colonne con par()
+par(mfrow=c(1,2))
+plot(g2000, col=clg)
+plot(g2015, col=clg)
+#sto mettendo a confronto la mappa del ghiaccio sciolto tra 2000 e 2015.
+#l'area rossa si è espansa tra il 2000 e il 2015, significa che lo scioglimento del ghiaccio è aumentato in quelle zone.
+
+par(mfrow=c(2,2))
+plot(g2000, col=clg)
+plot(g2005, col=clg)
+plot(g2010, col=clg)
+plot(g2015, col=clg)
+#Le quattro immagini (per gli anni 2000, 2005, 2010 e 2015) vengono visualizzate insieme in una matrice di 2x2.
+
+# stack
+greenland <- c(g2000, g2005, g2010, g2015)
+plot(greenland, col=clg)
+#Creo uno stack che combina i dati degli anni dal 2000 al 2015 in un unico oggetto raster e poi lo visualizzo
+
+#calcolo la differenza tra i dati del 2000 e del 2015
+difg = greenland[[1]] - greenland[[4]]
+clgreen <- colorRampPalette(c("red","white","blue")) (100)
+plot(difg, col=clgreen)
+#Calcolo la differenza tra lo scioglimento del ghiaccio nel 2000 (prima banda) e nel 2015 (quarta banda).
+#La differenza mi mostra quanto è aumentato lo scioglimento del ghiaccio tra questi anni, rosso significa che c'è stata una elevata perdita
+
+im.plotRGB(greenland, r=1, g=2, b=4) # g2000 on red, g2005 on green, g2015 on blue
+#Uso la funzione im.plotRGB() per creare un'immagine combinata utilizzando le bande di 2000 (rosso), 2005 (verde), e 2015 (blu).
+#Questa visualizzazione mi dà una rappresentazione combinata dello scioglimento del ghiaccio nel tempo.
+#Se l'area è rossa, significa che il ghiaccio era più sciolto nel 2000 rispetto agli altri anni.
+#Se l'area è verde, significa che nel 2005 c'era un aumento dello scioglimento.
+#Se è blu, significa che nel 2015 lo scioglimento è stato più pronunciato.
+#Cosa guardare: Se c'è un cambiamento visibile dal rosso al verde al blu, significa che lo scioglimento è aumentato nel tempo.
+
+# time series analysis
+#second method to quantify changes in time
+#the first method was based on classification
+
+library(imageRy)
+library(terra)
+
+#lista dei dati
+im.list()
+
+# import the data
+EN01 <- im.import("EN_01.png")
+EN13 <- im.import("EN_13.png")
+
+par(mfrow=c(2,1))
+im.plotRGB.auto(EN01)
+im.plotRGB.auto(EN13)
+
+# using the first element (band) of images
+dif = EN01[[1]] - EN13[[1]]
+
+# palette
+cldif <- colorRampPalette(c("blue", "white", "red")) (100)
+plot(dif, col=cldif)
+
+
+### New example: temperature in Greenland
+
+g2000 <- im.import("greenland.2000.tif")
+clg <- colorRampPalette(c("black", "blue", "white", "red")) (100)
+plot(g2000, col=clg)
+
+g2005 <- im.import("greenland.2005.tif")
+g2010 <- im.import("greenland.2010.tif")
+g2015 <- im.import("greenland.2015.tif")
+
+plot(g2015, col=clg)
+
+par(mfrow=c(1,2))
+plot(g2000, col=clg)
+plot(g2015, col=clg)
+
+# stacking the data
+stackg <- c(g2000, g2005, g2010, g2015)
+plot(stackg, col=clg)
+
+# Exercise: make the differencxe between the first and the final elemnts of the stack
+difg <- stackg[[1]] - stackg[[4]]
+# difg <- g2000 - g2015
+plot(difg, col=cldif)
+
+# Exercise: make a RGB plot using different years
+im.plotRGB(stackg, r=1, g=2, b=3)
+
+
+
+#LEZIONE 9 18/14/2024
+
+
 
 
 
