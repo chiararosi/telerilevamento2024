@@ -1357,6 +1357,125 @@ ocean <- rast("oceanisgreening_2022_lrg.jpg")
 im.plotRGB(ocean, 1, 2, 3)
 im.plotRGB(ocean, 2, 1, 3)
 
+# Importing data from external sources
+
+library(terra)
+library(imageRy)
+
+#1.Download an image from the network
+#2.Store it in your computer
+#3.Set the working directory: setwd("yourpath")
+#4.Import the data: library(terra) :  name <- rast("yourdata_in_the_working_directory")
+
+#1. vado per es. sul sito della NASA e scarico una immagine
+#decido di scaricare l'immagine dell'eclissi del 2003 -> Total solar eclipse over Antarctica
+#setwd("/home/duccio/Downloads")
+# make use of slash instead of backslash
+# Example: C://Documents/ instead of C:\\Documents\ 
+#"C: "/Users/kiko9/Downloads/file"
+#Serve per definire la cartella in cui verranno cercati o salvati i file durante la sessione R.
+#dopo aver impostato questa directory, ogni file caricato o salvato userà questa posizione come riferimento predefinito.
+#e i file delle immagini TIFF che analizzi si trovano nella cartella Downloads, questa funzione ti permette di accedervi direttamente senza dover specificare ogni volta il percorso completo.
+
+setwd( "/Users/kiko9/Downloads/file")
+
+eclissi <- rast("eclisse.jpg")
+# la funzione rast() viene utilizzata per caricare un'immagine (o dati raster) dal file eclissi.jpeg e convertirla in un oggetto raster utilizzabile nel pacchetto terra.
+#La funzione rast() appartiene al pacchetto terra e serve per creare un oggetto raster da un file, da un altro oggetto, o da un insieme di dati.
+#Un raster è una struttura dati usata per rappresentare matrici di valori che corrispondono a celle di una griglia regolare, tipicamente associate a immagini o dati geospaziali.
+#Se il file è un'immagine (come un JPEG), il raster avrà una o più bande (es. colori RGB).
+#L'immagine viene convertita in un oggetto SpatRaster, il formato raster usato da terra.
+#Ogni colore dell'immagine (ad esempio Rosso, Verde, Blu) sarà considerato una banda separata del raster.
+
+# plotting the data
+im.plotRGB(eclissi, 1, 2, 3)
+#le bande sono lasciate nel solito ordine, per cui per il rosso avremmo la banda 1, verde=2, blu=3; È  l'immagine originale o una versione che rispecchia il modo in cui i colori sono stati salvati nel file.
+im.plotRGB(eclissi, 3, 2, 1)
+#per il rosso abbiamo la terza banda, verde=2, per il blu abbiamo la prima banda; inverte il contributo dei canali rosso e blu, generando un'immagine con una tonalità diversa. 
+im.plotRGB(eclissi, 2, 3, 1
+#Banda 2 per il rosso. Banda 3 per il verde. Banda 1 per il blu. Cambia ulteriormente l'assegnazione dei colori, mostrando l'immagine con colori "scambiati". Ad esempio, un oggetto originariamente rosso potrebbe apparire verde.
+im.plotRGB(eclissi, 2, 1, 3)
+#Banda 2 per il rosso. Banda 1 per il verde. Banda 3 per il blu.
+
+# band difference
+#differenza tra due bande, in questo caso tra la prima e la seconda banda
+dif = eclissi[[1]] - eclissi[[2]]
+plot(dif)
+#rappresentano i valori di intensità per i canali di colore rosso (banda 1) e verde (banda 2).
+#La differenza è calcolata pixel per pixel: per ogni cella, viene sottratto il valore della banda 2 (verde) da quello della banda 1 (rosso).
+#Il risultato è un nuovo raster dif che rappresenta la variazione tra i due canali di colore.
+#Valori positivi: Indicano aree dove il canale rosso è più intenso del verde. Valori negativi: Indicano aree dove il canale verde è più intenso del rosso. Valori prossimi a zero: Indicano aree con intensità simile nei due canali.
+col_palette <- colorRampPalette(c("blue", "white", "red"))(100)
+plot(dif, col=col_palette)      
+#stiamo sul colore bianco, quindi non c'è quasi nessuna variazione, le due bande hanno intensità molto simili
+
+        
+# import another image
+ocean <- rast("oceanisgreening_2022_lrg.jpg")
+# è però una immagine rivoltata
+#per metterla correttamente c'è da usare la funzione flip()
+oceanriv <- flip (ocean, direction= "vertical")
+
+im.plotRGB(oceanriv, 1, 2, 3)#per il rosso abbiamo la prima banda, per il verde la seconda, per il blu la terza
+im.plotRGB(oceanriv, 2, 1, 3) #per il rosso la seconda banda, per il verde la prima, per il blu la terza
+
+
+
+
+# How to import external data in R
+
+install.packages("RNetCDF")
+library(RNetCDF) # needed to read Copernicus .nc data
+#RNetCDF: Pacchetto per lavorare con dati in formato NetCDF, utilizzati per dataset multidimensionali come quelli satellitari (es. Copernicus).
+library(terra)
+library(imageRy)
+
+setwd("/Users/kiko9/Downloads/file") 
+# make use of slash instead of backslash
+# Example: C://Documents/ instead of C:\\Documents\ 
+
+# read the data
+eclissi <- rast("eclisse.jpg") 
+# like i.import in imageRy
+# rast() is a function in the terra package
+eclissi
+#mettendo solo il nome in R questo fornisce informazioni sulle dimensioni, il numero di bande, la risoluzione e altre proprietà del raster.
+# plot the data
+im.plotRGB(eclissi, 1, 2, 3)
+im.plotRGB(eclissi, 2, 1, 3)
+im.plotRGB(eclissi, 3, 1, 2)
+
+# different methods of plotting
+par(mfrow=c(1,2))
+im.plotRGB(eclissi, 2, 1, 3)
+plotRGB(eclissi, 3, 1, 3)
+#Combina la visualizzazione di im.plotRGB() e plotRGB() (funzione standard di terra) per confrontare metodi di plotting.
+
+# band differencing
+dif = eclissi[[1]] - eclissi[[2]]
+# calcola la differenza pixel per pixel tra la banda 1 (rosso) e la banda 2 (verde), e la visualizza. Questa tecnica è utile per analizzare variazioni cromatiche.
+
+# import another image
+# Exercise: import another image from the net!
+cratere <- rast("cratere.jpg")
+im.plotRGB(cratere, 1, 2, 3)
+im.plotRGB(cratere, 2, 1, 3)
+
+# importing Copernicus data
+
+#Vai al portale Copernicus Open Access Hub.
+soil <- rast("2024-08-02-00_00_2024-08-02-23_59_sentinel-2_l2a_true_color_hr.jpg")
+soil
+plot(soil)
+plot(soil[[1]])
+#Il file 2024-08-02-00_00_2024-08-02-23_59_sentinel-2_l2a_true_color_hr.jpg è un dataset NetCDF contenente dati multidimensionali -> The mysteries of the Norwegian mountains
+#plot(soil) visualizza il dataset completo, mentre soil[[1]] seleziona e plotta solo una banda.
+
+# cropping data
+ext <- c(25, 35, 58, 62)
+soilcrop <- crop(soil, ext)
+#La funzione crop() ritaglia i dati raster all'interno di una regione specificata da ext.
+#Utile per concentrarsi su una specifica area geografica nei dati raster, soilcrop presenta solo i dati presenti nei pixel 25,35,58 e 62
 
 
 
