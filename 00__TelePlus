@@ -59,11 +59,81 @@ plot(dif)
 #sono 4 principali blocchi di dati più altre due variabili
 #c'è la vegetazione, dove ci sono gli indici spettrali, poi l'energia, l'acqua e il ghiaccio. In più ci sono gli hot spots dove ci sono varie variabili e poi c'è il groundbased ovvero i dati della biodiversità
 #a noi interessano i primi quattro blocchi perchè sono le immagini del satellite
+#queste sono tutte le variabili che riguardano la vegetazione (nella slide), la più facile è la Leaf Area Index, è il calcolo dell'area fogliare di una pianta in generale, che viene stimato dal satellite
+#misura la dimensione della foglia ed il suo spessore
+#abbiamo la frazione, la quantità di copertura vegetale che fa fotosintesi, relazioneta alla leaf area index, e rappresenta l'estensione orizzontale della vegetazione
+#FAPAR è la frazione, la quantità di radiazione che naturalmente partecipa alla fotosintesi, per cui fotosintesi PAR, quanta luce del sole viene assorbita dalle piante per fare la fotosintesi
+#altra variabile l'NDVI visto, che è la differenza tra l'infrarosso ed il rosso, perchè le piante riflettono l'infrarosso ed assorbono il rosso
+#abbiamo la condizione di salute, ovvero si va a vedere quale è il valore attuale di NDVI in funzione per esempio di una serie temporale
+#la produttività della pianta però in funzione del tempo. Misuro per es. 20 anni di produttività della pianta, per produttività si intende quanta biomassa fa la pianta
+#se l'NDVI è più basso della serie temporale vuol dire che c'è qualcosa che non va, se è più alto la pianta sta bene
+#la produttività secca è quando si va a terra e si misura la quantità di biomassa seccata, in questa maniera abbiamo la quantità di biomassa secca della pianta
+# abbiamo poi la copertura dell'area, vediamo quante piante ci sono nel territorio
+# un'altra variabile è relazionata al suolo, ma siccome al suolo sono relazionate anche le piante si chiama Soil Water Index, in questo caso è l'umidità del suolo
+#oltre all'umidità del suolo abbiamo anche la variabile Surf. Soil Moisture, che indica l'umidità del suolo ma solo del primo strato, nei primi pochi centrimetri del suolo
+#per l'energia invece abbiamo altre variabili che sono
+#la riflettanza della "top of canopy" ovvero della parte più alta degli oggetti, non necessariamente della vegetazione, in generale riguarda quanta luce generalmente viene riflessa
+#si chiama TOC reflectance
+#l'albedo, è considerato come degli oggetti, considera non solo la TOC ma anche degli oggetti del suolo che ci sta sotto, ed è la quantità di radiazione che viene riflessa
+#infine la LST, Land Surface Temperature, è la temperatura al suolo, non è la temperatura dell'aria, ma è quella del suolo
+#Water Cycle riguarda il ciclo dell'acqua di gran parte delle superficie di acqua dolce del pianeta
+#ci sono anche satelliti che misurano il ciclo dell'acqua degli oceani che si chiamano NOAA
+#abbiamo Lake Surface Water Temperature, è come quella del suolo ma dell'acqua, ci sono dei parametri per l'acqua
+#abbiamo la qualità dell'acqua, ci sono dei sensori che misurano (per es. i diossidi di azoto che abbiamo visto per l'area), misurano varie particelle nell'acqua
+#terza variabile è l'estensione delle acque, ci sono delle acque del pianeta che si chiamano ... che sono dei laghi che però si prosciugano durante la stagione secca, quindi si può misurare quale è l'estensione delle acque durante l'anno
+#un'altra variabile stimata è il livello dell'acqua, non è il vero livello, ma sulla base dei movimenti orizzontali dell'acqua si stima quanto è il suo livello verticale
+#e anche sulla riflettanza ... rispetto all'acqua pura si capisce la sua altezza e profondità
+#l'ultima è la criosfera
+#c'è l'estensione del ghiaccio dei laghi e l'estensione della neve
+#Snow cover calcola semplicemente la quantità di neve sul pianeta
+#poi abbiamo il ghiaccio nei laghi, stima ovviamente
+#l'altra variabile è l'equivalente in acqua della neve, è la stessa identica variabile, non è sempre disponibile, è una variabile un po' ostica
 
-ocean <- rast("capecod_1984164_lrg.jpg")
-im.plotRGB(ocean, 1, 2, 3)
-im.plotRGB(ocean, 2, 1, 3)
-#wd= work directory definisce il percorso di una certa cartella
+#ritorniamo ora con i dati di copernicus
+#su data_sources troviamo Copernicus, ci consiglia di registrarci sul sito
+#dopo esserci registrati possiamo scaricare i dati
+#ci sono dei dati con GigaBite molto elevati
+#Soil Moisture-> usando terra, con rast() abbiamo la mappa
+#possiamo fare un plot, come plot(soil), ci sono due variabili, una si chiama SSM, che è la variabile vera del Soil Moisture, ed accanto SSM ... che ci dà l'errore della variabile
+#se vogliamo plottare solo il primo livello dei due basterà fare plot(soil[[1]]) fare un subset con le parentesi quadre come abbiamo sempre fatto
+# importing Copernicus data
+soil <- rast("c_gls_SSM1km_202404160000_CEURO_S1CSAR_V1.2.1.nc")
+plot(soil)
+plot(soil[[1]])
+#così avremo solo le strisce del primo livello della variabile che ci interessa
+#quando andremo nella nostra area di studio a piacere, è inutile avere l'immagine sull'intero globo, per cui tagliamo l'immagine, usiamo per es. le coordinate per tagliare l'immagine
+#usiamo le coordinate per fare questo ritaglio
+#come si fa-> c'è bisogno di un codice
+# cropping data
+#prima di tutto si definisce una estensione es. ext
+#definisco l'estensione con dei minimi e dei massimi, x minima, x massima, y minima ed y massima
+#farò così un vettore, un array tramite c che le concateno
+ext <- c(25, 35, 58, 62)
+#a questo punto posso fare un "crop", la funzione è proprio crop() nella variabile soil fatta con l'estensione ext
+soilcrop <- crop(soil, ext)
+#ottengo così una nuova variabile che la posso plottare
+#posso fare un plot
+plot(soilcrop)
+#se voglio plottare solo il primo strato
+plot(soilcrop[[1]])
+
+#i passaggi quindi quali sono
+#definisco l'estensione: x min, x max, y min ed y max
+#faccio un crop() della variabile, della mappa iniziale, con l'estensione che abbiamo appena creato, la chiamo in un altro modo
+#poi faccio il plot() della nuova variabile
+#se voglio fare il plot di solo la prima banda o perlomeno solo della variabile di interesse utilizzerò [[]]
+#abbiamo così il ritaglio
+#quindi con oggi abbiamo imparato ad importare i dati dall'esterno e ritagliare le mappe, basta avere le coordinate
+#facendolo con le coordinate ci mantiene sempre la stessa area di studio in funzione di varie variabili o vari tempi della stessa variabile
+#per esempio io avevo varie variabili nella stessa area di studio, con crop() avrò sempre la stessa estensione delle varie variabili
+# How to import external data in R
+
+install.packages("RNetCDF")
+library(RNetCDF) # needed to read Copernicus .nc data #per leggere file NetCDF dopo il download manuale
+library(terra)
+library(imageRy)
+
+setwd("/home/duccio/Downloads") 
 # make use of slash instead of backslash
 # Example: C://Documents/ instead of C:\\Documents\ 
 
@@ -74,7 +144,7 @@ eclissi <- rast("eclissi.png")
 eclissi
 
 # plot the data
-im.plotRGB(eclissi  , 1, 2, 3)
+im.plotRGB(eclissi, 1, 2, 3)
 im.plotRGB(eclissi, 2, 1, 3)
 im.plotRGB(eclissi, 3, 1, 2)
 
@@ -97,59 +167,90 @@ soil <- rast("c_gls_SSM1km_202404160000_CEURO_S1CSAR_V1.2.1.nc")
 plot(soil)
 plot(soil[[1]])
 
+
 # cropping data
 ext <- c(25, 35, 58, 62)
 soilcrop <- crop(soil, ext)
 
+#per la prossima lezione sarà dedicata a calcolare la variabilità geomorfologica del ghiaccio, essendo un ambiente molto variabile
 
-
-
-
-
-
-
-
-
+#LEZIONE 10
 
 # Measuring variability from satellite imagery
-
+#oggi parleremo della misurazione della variabilità spaziale utilizzando immagini satellitari
+#calcolando in particolare la deviazione standard (SD) su diverse finestre spaziali, per evidenziare la variabilità delle bande spettrali di un'immagine.
 library(imageRy)
+#Pacchetto per lavorare con immagini raster in modo semplice
 library(terra)
+#Per manipolare e analizzare dati raster geospaziali
+#install.packages("viridisLite")
 # install.packages("viridis")
+library(viridisLite)
 library(viridis)
+#Fornisce una palette di colori visivamente piacevole e adatta alla rappresentazione dei dati. Soprattutto per tutte le persone colorblind
 
 im.list()
+#Mostra le immagini disponibili nel pacchetto imageRy o nella directory di lavoro.
 
 sent <- im.import("sentinel.png")
+#Importa l'immagine chiamata sentinel.png e la assegna all'oggetto sent
 
 im.plotRGB(sent, 1, 2, 3)
+
 
 # NIR = band 1
 # red = band 2
 # green = band 3
 
 im.plotRGB(sent, r=2, g=1, b=3)
+#Questa modifica l'ordine delle bande per la visualizzazione:
+#Rosso: banda 2 (Red)
+#Verde: banda 1 (Near Infrared - NIR)
+#Blu: banda 3 (Green)
+#questa visualizzazione può mettere in evidenza aspetti specifici dell'immagine, es. vegetazione
 
+#Esplorazione della banda NIR
+#associo, siccome so che la prima banda è l'infrarosso, nir alla prima banda di sent
 nir <- sent[[1]]
 cl <- colorRampPalette(c("red","orange","yellow"))(100)
 plot(nir, col=cl)
 
+#Calcolo della deviazione standard (SD)
 sd3 <- focal(nir, matrix(1/9, 3, 3), fun=sd)
+#focal(): Applica una funzione (qui la deviazione standard) su una finestra mobile intorno a ogni pixel. 
+#La finestra è una matrice 3x3: matrix(1/9, 3, 3).
+#fun=sd: Calcola la deviazione standard all'interno della finestra.
+#plot(sd3): Mostra il risultato come una mappa della variabilità locale.
 plot(sd3)
 
 viridisc <- colorRampPalette(viridis(7))(256)
 plot(sd3, col=viridisc)
+#viridis(7): Crea una palette di 7 colori usando la libreria viridis.
+#plot(sd3, col=viridisc): Visualizza la mappa della SD con una palette visivamente ottimale
 
 # Standard deviation 7x7
+#SD su una finestra più grande
 sd7 <- focal(nir, matrix(1/49, 7, 7), fun=sd)
 plot(sd7, col=viridisc)
+#Calcola la SD su una finestra 7x7. Una finestra più grande evidenzia variazioni più ampie e riduce i dettagli locali.
 
+#Creazione di uno stack
 # stack
 stacksd <- c(sd3, sd7)
+#c(sd3, sd7): Crea uno stack combinando le mappe della SD (3x3 e 7x7).
 plot(stacksd, col=viridisc)
+#plot(stacksd): Visualizza entrambe le mappe SD affiancate.
 
 # Standard deviation 13x13
+#SD su una finestra ancora più grande
+#Calcola la SD su una finestra 13x13, catturando variazioni su scale ancora più ampie.
 sd13 <- focal(nir, matrix(1/169, 13, 13), fun=sd)
-
 stacksd <- c(sd3, sd7, sd13)
+#Combina le tre mappe di SD (3x3, 7x7, 13x13) per confrontare la variabilità su diverse scale.
 plot(stacksd, col=viridisc)
+
+#Questo script analizza la variabilità spaziale di una banda spettrale (NIR) dell'immagine satellitare.
+#La deviazione standard evidenzia aree con maggiore variabilità dei valori di pixel, che potrebbero corrispondere a differenze nel tipo di copertura del suolo, nella vegetazione o in altre caratteristiche.
+#Variabilità locale: Mappe di SD (3x3) mostrano piccole variazioni.
+#Variabilità regionale: Mappe di SD (7x7, 13x13) mostrano tendenze più ampie.
+#Confronti visivi: Le diverse scale di SD aiutano a identificare regioni di interesse. Ad esempio, in una banda NIR, variazioni alte potrebbero rappresentare zone con diversi tipi di vegetazione o umidità del suolo.
