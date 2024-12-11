@@ -254,3 +254,64 @@ plot(stacksd, col=viridisc)
 #Variabilità locale: Mappe di SD (3x3) mostrano piccole variazioni.
 #Variabilità regionale: Mappe di SD (7x7, 13x13) mostrano tendenze più ampie.
 #Confronti visivi: Le diverse scale di SD aiutano a identificare regioni di interesse. Ad esempio, in una banda NIR, variazioni alte potrebbero rappresentare zone con diversi tipi di vegetazione o umidità del suolo.
+
+#LEZIONE 11
+
+# how to make multivariate analysis in R with remote sensing data
+
+library(terra)
+library(imageRy)
+library(viridis) # for the final plot
+
+im.list()
+
+b2 <- im.import("sentinel.dolomites.b2.tif")  
+b3 <- im.import("sentinel.dolomites.b3.tif")  
+b4 <- im.import("sentinel.dolomites.b4.tif")  
+b8 <- im.import("sentinel.dolomites.b8.tif")  
+#im.import importa le bande di un'immagine satellitare come oggetti raster.
+#Ogni banda corrisponde a una diversa lunghezza d'onda del satellite Sentinel-2:
+#b2: Banda del blu (490 nm)
+#b3: Banda del verde (560 nm)
+#b4: Banda del rosso (665 nm)
+#b8: Banda dell'infrarosso vicino (NIR, 842 nm)
+
+
+sentdo <- c(b2, b3, b4, b8)
+#creazione di un oggetto stack
+#Combina le bande in un unico oggetto stack (multistrato). Questo permette di trattarle insieme per analisi multivariate.
+
+im.plotRGB(sentdo, 4, 3, 2)
+#per la prima banda prendiamo l'elemento di sentdo nella quarta posizione, che sarebbe l'infrarosso b8
+#Questo è noto come falso colore: l'uso del NIR nella banda rossa evidenzia la vegetazione (rosso brillante).
+
+pairs(sentdo)
+#grafico delle relazioni tra bande
+#Crea una matrice di grafici di dispersione per visualizzare le correlazioni tra ogni coppia di bande.
+#Utile per verificare la relazione (lineare o non lineare) tra le bande spettrali, ad esempio, per individuare ridondanze.
+
+# pca
+#PCA: Analisi delle Componenti Principali
+pcimage <- im.pca(sentdo)
+#im.pca calcola la PCA sulle bande dello stack.
+#La PCA riduce la dimensionalità e combina le bande in componenti principali (PCs), ordinandole per importanza (varianza spiegata).
+#Ad esempio: PC1 rappresenta la maggior parte della varianza nei dati. PC2 rappresenta la seconda direzione di varianza più importante, e così via.
+#L'output pcimage è un raster multibanda, dove ogni banda corrisponde a una componente principale.
+
+#calcolo della varianza spiegata
+tot <- sum(1314.33400, 551.50879, 39.48238, 27.35780)
+1314.33400 * 100 / tot
+#Calcola la percentuale di varianza spiegata dalla prima componente principale (PC1).
+#Ad esempio: La somma totale delle varianze di tutte le componenti è calcolata. La varianza spiegata dalla PC1 è divisa per il totale e moltiplicata per 100.
+
+#visualizzazione della PCA
+plot(pcimage, col=viridis(100))
+plot(pcimage, col=plasma(100))
+#plot visualizza ogni componente principale come immagini raster, con gradazioni di colore:
+#viridis o plasma sono palette di colori per rappresentare i dati in modo chiaro e percettivamente uniforme.
+#Le immagini risultanti mostrano come le diverse componenti principali catturano variazioni nei dati spettrali.
+
+#quindi oggi cosa abbiamo fatto:
+#Analizzare immagini multibanda: Importa le bande di un'immagine satellitare per eseguire analisi multivariate.
+#Visualizzare i pattern principali: Un composito RGB aiuta a interpretare le proprietà visive delle bande. La PCA aiuta a ridurre la ridondanza e identificare i pattern più importanti nei dati.
+#Supportare applicazioni pratiche: Identificare coperture del suolo (es. vegetazione, suolo, acqua). Migliorare l'interpretazione delle immagini satellitari per scopi ecologici, climatici o di gestione territoriale.
