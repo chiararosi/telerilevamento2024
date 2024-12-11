@@ -403,3 +403,9 @@ plot(pcimage, col=plasma(100))
 #Analizzare immagini multibanda: Importa le bande di un'immagine satellitare per eseguire analisi multivariate.
 #Visualizzare i pattern principali: Un composito RGB aiuta a interpretare le proprietà visive delle bande. La PCA aiuta a ridurre la ridondanza e identificare i pattern più importanti nei dati.
 #Supportare applicazioni pratiche: Identificare coperture del suolo (es. vegetazione, suolo, acqua). Migliorare l'interpretazione delle immagini satellitari per scopi ecologici, climatici o di gestione territoriale.
+
+
+
+
+
+
