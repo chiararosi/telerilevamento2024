@@ -189,18 +189,67 @@ library(viridisLite)
 library(viridis)
 #Fornisce una palette di colori visivamente piacevole e adatta alla rappresentazione dei dati. Soprattutto per tutte le persone colorblind
 
+#quando si vuole passare da una misura ad un'altra, da una grandezza ad un'altra, lo si può fare solamente da dimensioni più grandi a dimensioni più piccole
+#es. cubo quadrimensionale a tre dimensioni
+#questa è la stessa cosa che faremo per le bande, vogliamo indurre un sistema bidimensionale, di due bande, in una sola banda; oppure un sistema tridimensionale con due bande o una sola
+#in generale vogliamo ridurre il sistema di multibande che abbiamo a disposizione
+#Questo è uno dei metodi, si chiama Analisi delle componenti principali-> PCA
+#per es. abbiamo due variabili che sono molto correlate tra di loro, c'è una correlazione altissima, per cui al posto di usare questi due assi posso usare un nuovo sistema di bande
+#che si chiamano argomenti principali, dove una delle due ha una varianza spiegata più alta della seconda
+#abbiamo le nostre due bande: banda 1 e banda 2, che può essere per es. rosso ed infrarosso; ammettiamo di avere i pixel e vedere che le due bande siano molto correlate tra loro
+#la variazione in questa variazione molto alta, quasi 1:1, abbiamo bisogno di due bande per visualizzare tutti questi pixel
+#possiamo vedere che la variazione dei vari pixel è motivata, contiene il 50% di variazione, ovvero la prima banda, la banda n1 va da qui a qui per spiegare tutta la variazione, la seconda ...
+#questi due segmenti sono uguali l'uno con l'altro, quindi la variabilità di un sistema si dice che è spiegata per un 50% dalla prima banda e per il 50% dalla seconda
+#abbiamo una nuvola di punti che sono molto correlati tra loro e quindi la variazione sulla x è esattamente uguale alla variazione sulla y
+#si dice spiegare la varianza in un linguaggio statistico, con una delle due bande spiega il 50% della variabilità totale
+#abbiamo bisogno di un vettore per capire come è fatto il sistema, perché in questo momento i punti sono correlati ed ognuna delle due spiega il 50%
+#si può fare un nuovo asse, che si chiama componente principale numero 1, e che per definizione passa sul lato più variabile di tutto il sistema
+#il secondo asse sarà perpendicolare al primo come erano gli assi principali, e si chiama seconda componente principale, PC2; questa è una delle tante analisi multivariate che si possono fare
+#c'è l'analisi della corrispondenza, analisi delle corrispondenze canoniche, analisi delle componenti principali
+#la componente principale numero 1 ha una variabilità enorme, perché i suoi valori sono molto elevati; mentre la componente numero due è più ristretta
+#mentre nel primo sistema avevamo degli assi per cui ognuna delle due componenti era rappresentata al 50% della variabilità
+#in questo caso abbiamo la componente principale numero 1 in realtà di tutto il sistema rappresenta per es. il 90%; mentre solo il 10% viene spiegato solo dalla componente principale
+#mentre gli assi iniziali ognuno aveva il 50% di variabilità, nelle componenti principali, ovvero negli assi variati, abbiamo la prima che ha praticamente il 90% della variabilità e la seconda che ha solo un pezzettino
+#se noi applichiamo questa trasformazione, possiamo rimuovere la componente numero 2, perché perderemo solo il 10% dell'informazione, e mantenere solo la prima che ci mantiene il 90%
+#per cui noi invece di usare il sistema con tutte le bande, noi ne vogliamo usare una sola, ovvero quella che ha la più alta variabilità del sistema
+
 im.list()
 #Mostra le immagini disponibili nel pacchetto imageRy o nella directory di lavoro.
 
 sent <- im.import("sentinel.png")
 #Importa l'immagine chiamata sentinel.png e la assegna all'oggetto sent
-
+sent
+#ci permette direttamente di plottare l'interno blocco la funzione im.import()
+#abbiamo visto però che c'è una banda in più in questa immagine, ovvero quella che è sentinel_4, che deriva dalla esportazione però, solo dal fatto che ho fatto esportazione, quindi la si può anche rimuovere
+#intento plottiamo l'immagine sent con le sue varie bande, per la banda 1 avremo il vicino infrarosso ecc. 
 im.plotRGB(sent, 1, 2, 3)
-
-
 # NIR = band 1
 # red = band 2
 # green = band 3
+#la quarta banda la dobbiamo eliminare, ci sono vari metodi
+#invece di eliminarla dal set presente, abbiamo la possibilità di fare un pacchetto di varie bande attraverso una funzione che si chiama stack()
+#stack() serve a tenere insieme le bande
+#quindi possiamo fare uno stack delle 3 bande iniziali, la banda n1,2,3
+stack <- c(sent[[1]], sent[[2]], sent[[3]])
+plot(stack)
+#ho levato quindi una dimensione, al posto di essere quarta dimensione ora ha 3 dimensioni, non aveva senso tenerla
+
+#vediamo ora quanto sono correlati questi pixel
+#abbiamo tre immagini, ora lavoriamo sulle prime due immagini, vediamo come sono correlati tra loro, vedo i vari pixel come si distribuiscono nella prima banda, poi nella seconda banda, ed il suo valore nella sua posizione
+#possiamo fare tutte le correlazioni tra tutte e tre le bande 
+pairs(stack)
+#ci fa una analisi di tutte le correlazioni che ci sono, una comparazione, per dimostrare che sono n*(n-1)/2, facciamo la prima per la seconda, la prima con la terza e la seconda con la terza (perché poi le altre sono la stessa cosa)
+#quindi abbiamo tre correlazioni -> 3*(3-1)/2=3 
+#lo facciamo con pairs(), del nostro dataset che si chiama stack
+#qui ci ha già quindi calcolato la quantità di correlazione tra le varie bande: infrarosso, rosso e verde
+#nel primo pannello, abbiamo la distribuzione dei pixel nelle tre bande
+#poi abbiamo la correlazione in termini grafici tra la prima banda e la seconda, tra la prima banda e la terza e tra la seconda banda e la terza
+#abbiamo poi i valori dell'indice di correlazione che si chiama correlazione di Pearson, che va da -1 a 1
+#1 è la correlazione perfetta, i valori corrispondono alle due bande
+# -1 è la correlazione perfetta ma negativa, è la stessa cosa solo opposta
+#questo è il metodo per andare a vedere quanto sono correlate tra loro le bande
+#se avevamo la quarta banda, la correlazione era 0, perché è sempre uguale, aveva un solo valore, per cui non era correlata con le altre, le altre variano mentre lei rimane fissa
+
 
 im.plotRGB(sent, r=2, g=1, b=3)
 #Questa modifica l'ordine delle bande per la visualizzazione:
@@ -257,6 +306,31 @@ plot(stacksd, col=viridisc)
 
 #LEZIONE 11
 
+#quando si vuole passare da una misura ad un'altra, da una grandezza ad un'altra, lo si può fare solamente da dimensioni più grandi a dimensioni più piccole
+#es. cubo quadrimensionale a tre dimensioni
+#questa è la stessa cosa che faremo per le bande, vogliamo indurre un sistema bidimensionale, di due bande, in una sola banda; oppure un sistema tridimensionale con due bande o una sola
+#in generale vogliamo ridurre il sistema di multibande che abbiamo a disposizione
+#Questo è uno dei metodi, si chiama Analisi delle componenti principali-> PCA
+#per es. abbiamo due variabili che sono molto correlate tra di loro, c'è una correlazione altissima, per cui al posto di usare questi due assi posso usare un nuovo sistema di bande
+#che si chiamano argomenti principali, dove una delle due ha una varianza spiegata più alta della seconda
+#abbiamo le nostre due bande: banda 1 e banda 2, che può essere per es. rosso ed infrarosso; ammettiamo di avere i pixel e vedere che le due bande siano molto correlate tra loro
+#la variazione in questa variazione molto alta, quasi 1:1, abbiamo bisogno di due bande per visualizzare tutti questi pixel
+#possiamo vedere che la variazione dei vari pixel è motivata, contiene il 50% di variazione, ovvero la prima banda, la banda n1 va da qui a qui per spiegare tutta la variazione, la seconda ...
+#questi due segmenti sono uguali l'uno con l'altro, quindi la variabilità di un sistema si dice che è spiegata per un 50% dalla prima banda e per il 50% dalla seconda
+#abbiamo una nuvola di punti che sono molto correlati tra loro e quindi la variazione sulla x è esattamente uguale alla variazione sulla y
+#si dice spiegare la varianza in un linguaggio statistico, con una delle due bande spiega il 50% della variabilità totale
+#abbiamo bisogno di un vettore per capire come è fatto il sistema, perché in questo momento i punti sono correlati ed ognuna delle due spiega il 50%
+#si può fare un nuovo asse, che si chiama componente principale numero 1, e che per definizione passa sul lato più variabile di tutto il sistema
+#il secondo asse sarà perpendicolare al primo come erano gli assi principali, e si chiama seconda componente principale, PC2; questa è una delle tante analisi multivariate che si possono fare
+#c'è l'analisi della corrispondenza, analisi delle corrispondenze canoniche, analisi delle componenti principali
+#la componente principale numero 1 ha una variabilità enorme, perché i suoi valori sono molto elevati; mentre la componente numero due è più ristretta
+#mentre nel primo sistema avevamo degli assi per cui ognuna delle due componenti era rappresentata al 50% della variabilità
+#in questo caso abbiamo la componente principale numero 1 in realtà di tutto il sistema rappresenta per es. il 90%; mentre solo il 10% viene spiegato solo dalla componente principale
+#mentre gli assi iniziali ognuno aveva il 50% di variabilità, nelle componenti principali, ovvero negli assi variati, abbiamo la prima che ha praticamente il 90% della variabilità e la seconda che ha solo un pezzettino
+#se noi applichiamo questa trasformazione, possiamo rimuovere la componente numero 2, perché perderemo solo il 10% dell'informazione, e mantenere solo la prima che ci mantiene il 90%
+#per cui noi invece di usare il sistema con tutte le bande, noi ne vogliamo usare una sola, ovvero quella che ha la più alta variabilità del sistema
+
+
 # how to make multivariate analysis in R with remote sensing data
 
 library(terra)
@@ -289,6 +363,20 @@ pairs(sentdo)
 #grafico delle relazioni tra bande
 #Crea una matrice di grafici di dispersione per visualizzare le correlazioni tra ogni coppia di bande.
 #Utile per verificare la relazione (lineare o non lineare) tra le bande spettrali, ad esempio, per individuare ridondanze.
+
+
+#adesso andiamo a compattare questo dataset al posto di usare tutte e tre le bande, vediamo se è possibile compattarlo in una sola dimensione
+#PCA
+#la prima cosa che dobbiamo fare è che siccome questa analisi non si può fare direttamente sull'immagine, dobbiamo prendere un campione, ovvero una serie di pixel random, e su quella serie andare ad operare questa analisi delle componenti principali
+#la prima funzione che dobbiamo usare è samplerandom() del pacchetto raster però, prende un pacchetto random dei nostri pixel-> dobbiamo scrivere il numero, la size, del quantitativo di pixel che vogliamo prendere
+#più il campione è grande e meglio è-> così abbiamo per es. i 10 mila pixel ed i loro valori nelle varie bande
+#mi aspetto che i valori siano diversi tra di loro
+#in questo caso ho preso i campioni e li ho immessi in una sola dimensione
+
+
+#la funzione summary() è colei che fa i sommari delle varie analisi, per cui da tutto il report dell'output
+
+
 
 # pca
 #PCA: Analisi delle Componenti Principali
