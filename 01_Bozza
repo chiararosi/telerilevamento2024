@@ -1,11 +1,1 @@
-#il progetto prende in considerazione un'area dell'Emilia Romagna in cui è avvenuta l'alluvione del 2023
-#facendo uno studio dell'area dal 2020 al 2024
-#gli obiettivi del lavoro sono:
-# Analizzare i cambiamenti nel territorio e nella vegetazione a seguito delle alluvioni
-# Monitorare la variazione della copertura del suolo e delle aree agricole nel tempo
-# Valutare l'impatto delle inondazioni su terreni agricoli, infrastrutture o ecosistemi naturali.
-# L'area presa in considerazione è nei pressi del comune di Alfonsine
-# Sentinel-1: Dati radar utili per rilevare aree allagate, indipendentemente dalle condizioni meteorologiche o di luce.
-# Sentinel-2: Dati ottici per monitorare la vegetazione, l'uso del suolo e i cambiamenti. (dati corretti atmosfericamente) per analisi ottiche.
-# Operation Land Imagery con il satellite Landsat 8 e Landsat 9
 
