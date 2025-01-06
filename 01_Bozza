@@ -6,11 +6,16 @@ library(ggplot2)
 
 
 #list.files() è una funzione che mi permette di elencare tutti i files presenti nella directory che io ho specificato, quindi come output ci saranno tutti i nomi dei file presenti nella cartella
-list.files ("C:/Users/kiko9/Downloads/esametele")
+list.files("C:/Users/kiko9/Downloads/esametele")
 #imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer
 setwd("C:/Users/kiko9/Downloads/esametele")
 
 #Prima analisi: Anno 2020 
 #mi importo la banda 2 dell'immagine Sentinel-2
 #metto le virgolette perché sono presenti nel nome completo dell'immagine
-Banda02_2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff")  
+Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff")  
+Banda03_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
