@@ -3,16 +3,18 @@ library(imageRy)
 library(viridisLite)
 library(viridis)
 library(ggplot2)
+library(patchwork) #di terra la funzione area viene mascherata da quella del pacchetto patchwork
+library(ggfortify)
+library(factoextra)
 
 
 #list.files() è una funzione che mi permette di elencare tutti i files presenti nella directory che io ho specificato, quindi come output ci saranno tutti i nomi dei file presenti nella cartella
-list.files("C:/Users/kiko9/Downloads/esametele")
-#imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer
-setwd("C:/Users/kiko9/Downloads/esametele")
-
-#Prima analisi: Anno 2020 
+#imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer con setwd()
+#Anno 2020 
 #mi importo la banda 2 dell'immagine Sentinel-2
 #metto le virgolette perché sono presenti nel nome completo dell'immagine
+list.files("C:/Users/kiko9/Downloads/esametele/2020")
+setwd("C:/Users/kiko9/Downloads/esametele/2020")
 Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff")  
 Banda03_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
@@ -21,6 +23,8 @@ Banda8A_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B8A_(Raw
 Banda12_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
 # Anno 2021
+list.files("C:/Users/kiko9/Downloads/esametele/2021")
+setwd("C:/Users/kiko9/Downloads/esametele/2021")
 Banda02_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
 Banda03_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
@@ -29,6 +33,8 @@ Banda8A_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B8A_(Raw
 Banda12_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
 #Anno 2022
+list.files("C:/Users/kiko9/Downloads/esametele/2022")
+setwd("C:/Users/kiko9/Downloads/esametele/2022")
 Banda02_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
 Banda03_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
@@ -37,6 +43,8 @@ Banda8A_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B8A_(Raw
 Banda12_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
 #Anno 2023
+list.files("C:/Users/kiko9/Downloads/esametele/2022")
+setwd("C:/Users/kiko9/Downloads/esametele/2023")
 Banda02_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
 Banda03_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
@@ -45,6 +53,8 @@ Banda8A_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B8A_(Raw
 Banda12_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
 #Anno 2024
+list.files("C:/Users/kiko9/Downloads/esametele/2024")
+setwd("C:/Users/kiko9/Downloads/esametele/2024")
 Banda02_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
 Banda03_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
@@ -52,8 +62,21 @@ Banda08_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B08_(Raw
 Banda8A_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
 Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
+dev.off()
 
 # Calcolo degli indici spettrali
+#Partendo dall'anno 2020
+#NDWI= Normalize Difference Water Index; Indice per il monitoraggio dell'acqua, evidenzia la presenza dell'acqua sulla superficie terrestre
+setwd("C:/Users/kiko9/Downloads/esametele/2020")
+
+
+
+
+
+
+
+
+
 
 
 
