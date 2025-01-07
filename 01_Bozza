@@ -19,3 +19,46 @@ Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw
 Banda08_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
 Banda8A_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
 Banda12_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+# Anno 2021
+Banda02_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+#Anno 2022
+Banda02_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+#Anno 2023
+Banda02_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+#Anno 2024
+Banda02_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+
+# Calcolo degli indici spettrali
+
+
+
+
+
+
+
+
