@@ -65,9 +65,12 @@ Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw
 dev.off()
 
 # Calcolo degli indici spettrali
+
 #Partendo dall'anno 2020
 #NDWI= Normalize Difference Water Index; Indice per il monitoraggio dell'acqua, evidenzia la presenza dell'acqua sulla superficie terrestre
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
+list.files("C:/Users/kiko9/Downloads/esametele/2020")
+NDWI_2020 <- rast()
 
 
 
