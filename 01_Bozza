@@ -1,21 +1,35 @@
-library(terra)
-library(imageRy)
+library(terra) 
+#il pacchetto terra permette di lavorare su dati raster e in generale su oggetti geospaziali
+library(imageRy) 
+#il pacchetto imageRy permette di manipolare e analizzare immagini raster, particolarmente utili per immagini satellitari, utile perché si può usare insieme al pacchetto terra
 library(viridisLite)
 library(viridis)
+# questi due pacchetti forniscono una palette di colori che possono essere visti facilmente anche per i daltonici, ottimizzando così la visualizzazione delle immagini
 library(ggplot2)
-library(patchwork) #di terra la funzione area viene mascherata da quella del pacchetto patchwork
+# il pacchetto ggplot2 permette di creare grafici personalizzati e complessi, utile per confrontare le variazioni temporali
+library(patchwork) 
+#Del pacchetto terra la funzione area viene mascherata da quella del pacchetto patchwork
+# il pacchetto patchwork è utile per disporre i grafici creati tramite ggplot2, organizza i grafici creando layout precisi
 library(ggfortify)
+#semplifica la visualizzazione di analisi multivariate (es. Analisi delle Componenti Principali = PCA)
 library(factoextra)
+#questo pacchetto semplifica la visualizzazione e l'interpretazione delle analisi multivariate
 
 
 #list.files() è una funzione che mi permette di elencare tutti i files presenti nella directory che io ho specificato, quindi come output ci saranno tutti i nomi dei file presenti nella cartella
 #imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer con setwd()
+
 #Anno 2020 
-#mi importo la banda 2 dell'immagine Sentinel-2
-#metto le virgolette perché sono presenti nel nome completo dell'immagine
+
 list.files("C:/Users/kiko9/Downloads/esametele/2020")
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
+#la funzione rast() è una funzione del pacchetto terra e serve a caricare un oggetto raster su R
+# creo un oggetto Banda02_2020 attraverso l'assegnazione <- 
+#mi importo la banda 2 dell'immagine Sentinel-2
+#metto le virgolette perché sono presenti nel nome completo dell'immagine
+#Gli oggetti raster rappresentano dati spaziali organizzati in una griglia regolare di celle (pixel)
 Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff")  
+#importo 
 Banda03_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
 Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
 Banda08_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
@@ -62,7 +76,6 @@ Banda08_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B08_(Raw
 Banda8A_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
 Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
-dev.off()
 
 # Calcolo degli indici spettrali
 
