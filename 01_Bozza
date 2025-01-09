@@ -83,7 +83,15 @@ Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw
 #NDWI= Normalize Difference Water Index; Indice per il monitoraggio dell'acqua, evidenzia la presenza dell'acqua sulla superficie terrestre
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
 list.files("C:/Users/kiko9/Downloads/esametele/2020")
-NDWI_2020 <- rast()
+#importo l'immagine di Sentinel 2 che rappresenta NDWI attraverso la funzione rast() di 
+#carico l'immagine a colori naturali come oggetto raster
+TRUECOL2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_True_color.tiff")
+plot(TRUECOL2020)
+NDWI_2020 <- rast( "2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_NDWI.tiff")
+#visualizzo l'immagine plottandola tramite la funzione di terra plot()
+plot(NDWI_2020)
+#questo indice identifica le aree allagate
+
 
 
 
