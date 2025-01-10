@@ -1,5 +1,9 @@
 library(terra) 
-#il pacchetto terra permette di lavorare su dati raster e in generale su oggetti geospaziali
+#il pacchetto terra permette di manipolare dati geografici (spaziali) nella forma di "raster" e "vettori".
+# I dati Raster dividono lo spazio in griglie regolari di celle e sono comunemente usate per rappresentare fenomeni spazialmente continui es. le condizioni ambientali.
+#Le immagini satellitari hanno anche loro questa struttura di dati, e in questo contesto le griglie di celle sono spesso riferiti come pixels.
+#I vettori invece dei dati spaziali (punti, linee, poligoni) sono spesso usati per rappresentare entità spaziali discrete, come le strade e paesi.
+#In questo progetto si lavorerà su dati di tipologia SpatRaster.
 library(imageRy) 
 #il pacchetto imageRy permette di manipolare e analizzare immagini raster, particolarmente utili per immagini satellitari, utile perché si può usare insieme al pacchetto terra
 library(viridisLite)
@@ -9,15 +13,15 @@ library(ggplot2)
 # il pacchetto ggplot2 permette di creare grafici personalizzati e complessi, utile per confrontare le variazioni temporali
 library(patchwork) 
 #Del pacchetto terra la funzione area viene mascherata da quella del pacchetto patchwork
-# il pacchetto patchwork è utile per disporre i grafici creati tramite ggplot2, organizza i grafici creando layout precisi
+# il pacchetto patchwork è utile per disporre i grafici creati tramite ggplot2, organizza i grafici creando layout precisi, permette la composizione di più grafici e allo stesso tempo la loro analisi
 library(ggfortify)
-#semplifica la visualizzazione di analisi multivariate (es. Analisi delle Componenti Principali = PCA)
+#semplifica la visualizzazione di analisi multivariate (es. Analisi delle Componenti Principali = PCA) in relazione ai grafici di ggplot2
 library(factoextra)
 #questo pacchetto semplifica la visualizzazione e l'interpretazione delle analisi multivariate
 
 
-#list.files() è una funzione che mi permette di elencare tutti i files presenti nella directory che io ho specificato, quindi come output ci saranno tutti i nomi dei file presenti nella cartella
-#imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer con setwd()
+#list.files() è una funzione di R che mi permette di elencare tutti i files presenti nella directory che io ho specificato, quindi come output ci saranno tutti i nomi dei file presenti nella cartella
+#imposto ora la directory su cui lavorerò, dove R prenderà i files, la cartella del mio computer con la funzione setwd()
 
 #Anno 2020 
 
@@ -25,16 +29,25 @@ list.files("C:/Users/kiko9/Downloads/esametele/2020")
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
 #la funzione rast() è una funzione del pacchetto terra e serve a caricare un oggetto raster su R
 # creo un oggetto Banda02_2020 attraverso l'assegnazione <- 
-#mi importo la banda 2 dell'immagine Sentinel-2
+#mi importo la banda 2 dell'immagine Sentinel-2, la banda 2 di Sentinel corrisponde alla banda del blu
 #metto le virgolette perché sono presenti nel nome completo dell'immagine
 #Gli oggetti raster rappresentano dati spaziali organizzati in una griglia regolare di celle (pixel)
-Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff")  
-#importo 
+Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff") 
+
+# TIFF= Tagged Image File Format, è un formato di file utilizzato per immagini raster, è in grado immagazzinare dati geospaziali e può supportare immagini multispettrali
+
 Banda03_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+#Carico attraverso la funzione rast() la Banda numero 3 del satellite Sentinel-2 che corrisponde alla banda del verde, creo un oggetto Banda03_2020 attraverso l'assegnazione <-
 Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+#Carico la Banda numero 4 che rappresenterebbe la banda del rosso
 Banda08_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+#La banda numero 8 è il NIR= Near InfraRed, Vicino Infrarosso
 Banda8A_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+#La Banda 8A rappresenta il Narrow NIR, è una parte specifica dell'infrarosso vicino, ha una lunghezza d'onda centrata a 865 nm; offre maggiori dettagli rispetto alla banda del NIR
 Banda12_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+#La Banda 12 rappresenta la banda SWIR= Short Wave Infrared, è un sottoinsieme della banda dell'infrarosso, molto utile perché differenzia bene l'acqua dalla vegetazione
+
+#Questa operazione la faccio per tutti gli anni che ho preso in considerazione
 
 # Anno 2021
 list.files("C:/Users/kiko9/Downloads/esametele/2021")
@@ -83,23 +96,37 @@ Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw
 #NDWI= Normalize Difference Water Index; Indice per il monitoraggio dell'acqua, evidenzia la presenza dell'acqua sulla superficie terrestre
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
 list.files("C:/Users/kiko9/Downloads/esametele/2020")
-#importo l'immagine di Sentinel 2 che rappresenta NDWI attraverso la funzione rast() di 
+#importo l'immagine di Sentinel 2 che rappresenta NDWI attraverso la funzione rast() di terra
 #carico l'immagine a colori naturali come oggetto raster
+#Questo oggetto TRUECOL2020 lo creo tramite l'assegnazione <-; esso sarà un oggetto di classe SpatRater, multispettrale, con ben 3 bande RGB
+#SpatRast è il formato raster usato da terra
+#la prima banda è il rosso=Red, la seconda rappresenta il verde = Green; la terza è il Blu; In Sentinel-2, le bande RGB sono 4, 3, 2.
 TRUECOL2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_True_color.tiff")
 plot(TRUECOL2020)
+#visualizzo l'immagine plottandola tramite la funzione di R plot() usata nel pacchetto terra che mi permette di visualizzare le immagini raster
+
 NDWI_2020 <- rast( "2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_NDWI.tiff")
-#visualizzo l'immagine plottandola tramite la funzione di terra plot()
+#Creo un nuovo oggetto che rappresenta l'indice NDWI del territorio nel 2020, attraverso la funzione rast() e con assegnazione <-
+#Avendo scaricato l'immagine satellitare di Sentinel-2 che rappresenta proprio l'indice Normalize Difference Water Index
 plot(NDWI_2020)
-#questo indice identifica le aree allagate
+indexNDWI_2020 <- (Banda03_2020 - Banda08_2020) / (Banda03_2020 + Banda08_2020)
+summary(indexNDWI_2020)
+
+#questo indice identifica le aree allagate e in generale la presenza di corpi idrici
+#Solo graficamente possiamo vedere che nel 2020 non erano presenti aree allagate nel territorio
+#Adesso si può confrontare l'immagine True Color con l'immagine NDWI dopo averle plottate attraverso la funzione par()
+par(mfrow=
+
+#Se i valori di NDWI sono elevati indicano la presenza di acqua
 
 
+#calcolando l'indice NDVI= Normalize Difference Vegetation Index
+NDVI_2020 <- (Banda08_2020 - Banda04_2020) / (Banda08_2020 + Banda04_2020)
+summary(NDVI_2020)
 
+#i valori soglia 0.2 o 0.3 rappresenta una copertura vegetale molto bassa, quasi suolo nudo
 
-
-
-
-
-
+vegetazione_2020 <- NDVI_2020 > 0.3
 
 
 
