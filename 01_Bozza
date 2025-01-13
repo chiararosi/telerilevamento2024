@@ -333,6 +333,9 @@ prop2021
 
 
 
+class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4", "black")
+> ClassificationNDWI_2023 <- im.classify (NDWI_2023, 5, seed= TRUE)
+> plot( ClassificationNDWI_2023, col = class_col, main = "Classificazione Aree Umide 2023")
 
 
 
