@@ -339,4 +339,11 @@ class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4", "
 
 
 
+setwd("C:/Users/kiko9/Downloads/esametele/2023")
+stack2023 <- c( Banda12_2023, Banda8A_2023, Banda04_2023)
+im.plotRGB(stack2023, 1, 2, 3)
+
+> ClassificationNDWI_2023 <- im.classify (stack2023, 5, seed= TRUE)
+> plot( ClassificationNDWI_2023, col = class_col, main = "Classificazione Aree Umide 2023")
+
 
