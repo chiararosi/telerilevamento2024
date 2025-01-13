@@ -73,7 +73,7 @@ Banda8A_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B8A_(Raw
 Banda12_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
 
 #Anno 2023
-list.files("C:/Users/kiko9/Downloads/esametele/2022")
+list.files("C:/Users/kiko9/Downloads/esametele/2023")
 setwd("C:/Users/kiko9/Downloads/esametele/2023")
 Banda02_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
 Banda03_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
@@ -173,11 +173,163 @@ tot2020
 prop2020 = FreqNDWI_2020 / tot2020
 prop2020
 #area altamente umida= 26%; area mediamente umida = 24%; area poco umida= 35%; area secca= 15%
-
+dev.off()
 
 
 
 #Analisi 2021
+#richiamo la directory per l'anno 2021
+setwd("C:/Users/kiko9/Downloads/esametele/2021")
+#rivedo i files che sono presenti al suo interno
+list.files("C:/Users/kiko9/Downloads/esametele/2021")
+#prelevo dalla lista il raster dell'immagine True Color e NDWI
+TRUECOL2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_True_color.tiff")
+NDWI_2021 <- rast("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_NDWI.tiff")
+#creo un multiframe con queste due immagini raster spaziali
+par(mfrow=c(1,2))
+plot(TRUECOL2021)
+plot(NDWI_2021)
+dev.off()
+# calcolo l'indice NDVI del 2020
+NDVI_2021 <- (Banda08_2021 - Banda04_2021) / (Banda08_2021 + Banda04_2021)
+summary(NDVI_2021)
+vegetazione_2021 <- NDVI_2021 > 0.3
+plot (vegetazione_2021, main = "Indice di Vegetazione 2021")
+#si presentano due classi True e False, in True è presente la vegetazione, in False è presente l'assenza di vegetazione o perlomeno con un indice NDVI < 0.3
+#posso classificare ora l'immagine NDWI
+#1° classe: area molto umida, 2° classe: area umida; 3° classe: area poco umida; 4° classe: area secca
+#creo il vettore con i colori che utilizzerò nella immagine
+class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4")
+ClassificationNDWI_2021 <- im.classify (NDWI_2021, 4, seed= TRUE)
+plot( ClassificationNDWI_2021, col = class_col, main = "Classificazione Aree Umide 2021")
+
+
+
+setwd("C:/Users/kiko9/Downloads/esametele/2021")
+#rivedo i files che sono presenti al suo interno
+list.files("C:/Users/kiko9/Downloads/esametele/2021")
+#prelevo dalla lista il raster dell'immagine True Color e NDWI
+TRUECOL2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_True_color.tiff")
+SWIR_2021 <- rast("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_SWIR.tiff")
+#creo un multiframe con queste due immagini raster spaziali
+par(mfrow=c(1,2))
+plot(TRUECOL2021)
+plot(SWIR_2021)
+dev.off()
+# calcolo l'indice NDVI del 2020
+NDVI_2021 <- (Banda08_2021 - Banda04_2021) / (Banda08_2021 + Banda04_2021)
+summary(NDVI_2021)
+vegetazione_2021 <- NDVI_2021 > 0.3
+plot (vegetazione_2021, main = "Indice di Vegetazione 2021")
+#si presentano due classi True e False, in True è presente la vegetazione, in False è presente l'assenza di vegetazione o perlomeno con un indice NDVI < 0.3
+#posso classificare ora l'immagine NDWI
+#1° classe: area molto umida, 2° classe: area umida; 3° classe: area poco umida; 4° classe: area secca
+#creo il vettore con i colori che utilizzerò nella immagine
+class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4")
+ClassificationSWIR_2021 <- im.classify (SWIR_2021, 4, seed= TRUE)
+plot( ClassificationSWIR_2021, col = class_col, main = "Classificazione Aree Umide 2021")
+
+
+
+
+
+
+
+#
+#Calcolo ora le frequenze delle varie aree
+FreqNDWI_2021 <- freq (ClassificationNDWI_2021)
+FreqNDWI_2021
+# per la 1° classe= 310892 pixels, 2° classe = 414370; 3° classe = 303857; 4° classe = 318381
+#Calcolo ora le proporzioni, prima trovando il totale
+tot2021 <- ncell(NDWI_2021)
+tot2021
+#il totale dei pixel sono 1347500
+prop2021 = FreqNDWI_2021 / tot2021
+prop2021
+# la 1° classe è il 23%; 2° classe rappresenta il 31%; la 3° classe è il 22%; la 4° classe è il 24%
+
+#Analisi del 2022
+
+#Analisi del 2023
+list.files("C:/Users/kiko9/Downloads/esametele/2023")
+setwd("C:/Users/kiko9/Downloads/esametele/2023")
+TRUECOL2023 <- rast("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_True_color.tiff")
+NDWI_2023 <- rast("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_NDWI.tiff")
+par(mfrow=c(1,2))
+plot(TRUECOL2023)
+plot(NDWI_2023)
+dev.off()
+# calcolo l'indice NDVI del 2023
+NDVI_2023 <- (Banda08_2023 - Banda04_2023) / (Banda08_2023 + Banda04_2023)
+summary(NDVI_2023)
+vegetazione_2023 <- NDVI_2023 > 0.3
+plot (vegetazione_2023, main = "Indice di Vegetazione 2023")
+#si presentano due classi True e False, in True è presente la vegetazione, in False è presente l'assenza di vegetazione o perlomeno con un indice NDVI < 0.3
+#posso classificare ora l'immagine NDWI
+#1° classe: area molto umida, 2° classe: area umida; 3° classe: area poco umida; 4° classe: area secca
+#creo il vettore con i colori che utilizzerò nella immagine
+class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4")
+ClassificationNDWI_2023 <- im.classify (NDWI_2023, 4, seed= TRUE)
+plot( ClassificationNDWI_2023, col = class_col, main = "Classificazione Aree Umide 2023")
+#              la 3° classe rappresenta l'ACQUA, area molto umida
+#Calcolo ora le frequenze delle varie aree
+FreqNDWI_2023 <- freq (ClassificationNDWI_2023)
+FreqNDWI_2021
+# per la 1° classe= 310892 pixels, 2° classe = 414370; 3° classe = 303857; 4° classe = 318381
+#Calcolo ora le proporzioni, prima trovando il totale
+tot2021 <- ncell(NDWI_2021)
+tot2021
+#il totale dei pixel sono 1347500
+prop2021 = FreqNDWI_2021 / tot2021
+prop2021
+# la 1° classe è il 23%; 2° classe rappresenta il 31%; la 3° classe è il 22%; la 4° classe è il 24%
+
+
+
+
+
+
+
+
+
+
+list.files("C:/Users/kiko9/Downloads/esametele/2023")
+setwd("C:/Users/kiko9/Downloads/esametele/2023")
+TRUECOL2023 <- rast("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_True_color.tiff")
+SWIR_2023 <- rast("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_SWIR.tiff")
+par(mfrow=c(1,2))
+plot(TRUECOL2023)
+plot(SWIR_2023)
+dev.off()
+# calcolo l'indice NDVI del 2023
+NDVI_2023 <- (Banda08_2023 - Banda04_2023) / (Banda08_2023 + Banda04_2023)
+summary(NDVI_2023)
+vegetazione_2023 <- NDVI_2023 > 0.3
+plot (vegetazione_2023, main = "Indice di Vegetazione 2023")
+#si presentano due classi True e False, in True è presente la vegetazione, in False è presente l'assenza di vegetazione o perlomeno con un indice NDVI < 0.3
+#posso classificare ora l'immagine NDWI
+#1° classe: area molto umida, 2° classe: area umida; 3° classe: area poco umida; 4° classe: area secca
+#creo il vettore con i colori che utilizzerò nella immagine
+class_col <- c("darkturquoise", "darkolivegreen", "darkorchid3", "chocolate4")
+ClassificationSWIR_2023 <- im.classify (SWIR_2023, 4, seed= TRUE)
+plot( ClassificationSWIR_2023, col = class_col, main = "Classificazione Aree Umide 2023")
+
+
+
+
+
+#              la 3° classe rappresenta l'ACQUA, area molto umida
+#Calcolo ora le frequenze delle varie aree
+FreqNDWI_2023 <- freq (ClassificationNDWI_2023)
+FreqNDWI_2021
+# per la 1° classe= 310892 pixels, 2° classe = 414370; 3° classe = 303857; 4° classe = 318381
+#Calcolo ora le proporzioni, prima trovando il totale
+tot2021 <- ncell(NDWI_2021)
+tot2021
+#il totale dei pixel sono 1347500
+prop2021 = FreqNDWI_2021 / tot2021
+prop2021
+# la 1° classe è il 23%; 2° classe rappresenta il 31%; la 3° classe è il 22%; la 4° classe è il 24%
 
 
 
