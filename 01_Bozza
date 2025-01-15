@@ -135,6 +135,7 @@ dev.off()
 #per essere misurato quest'indice utilizza la banda del NIR e del Rosso
 NDVI_2020 <- (Banda08_2020 - Banda04_2020) / (Banda08_2020 + Banda04_2020)
 summary(NDVI_2020)
+# I valori possono variare tra -1 e 1, ma quelli compresi tra -1 e 0 sono tipici di aree non coltivate come corsi d’acqua e zone antropiche.
 #i valori soglia 0.2 o 0.3 rappresenta una copertura vegetale molto bassa, quasi suolo nudo
 #pongo il valore soglia > 0.3, così che posso analizzare se è presente vegetazione sana o meno ed è utile quando si vuole fare dei confronti temporali
 vegetazione_2020 <- NDVI_2020 > 0.3
