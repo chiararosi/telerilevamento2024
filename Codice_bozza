@@ -1,0 +1,143 @@
+library(terra)
+library(imageRy)
+library(viridisLite)
+library(viridis)
+library(ggplot2)
+library(patchwork) 
+library(ggfortify)
+library(factoextra)
+
+#Anno 2020
+list.files("C:/Users/kiko9/Downloads/esametele/2020")
+setwd("C:/Users/kiko9/Downloads/esametele/2020")
+Banda02_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B02_(Raw).tiff") 
+Banda03_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2020 <- rast ("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+
+
+
+# Anno 2021
+list.files("C:/Users/kiko9/Downloads/esametele/2021")
+setwd("C:/Users/kiko9/Downloads/esametele/2021")
+Banda02_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+
+
+
+#Anno 2022
+list.files("C:/Users/kiko9/Downloads/esametele/2022")
+setwd("C:/Users/kiko9/Downloads/esametele/2022")
+Banda02_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+#Anno 2023
+list.files("C:/Users/kiko9/Downloads/esametele/2023")
+setwd("C:/Users/kiko9/Downloads/esametele/2023")
+Banda02_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2023 <- rast ("2023-05-23-00_00_2023-05-23-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+
+
+#Anno 2024
+list.files("C:/Users/kiko9/Downloads/esametele/2024")
+setwd("C:/Users/kiko9/Downloads/esametele/2024")
+Banda02_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B02_(Raw).tiff")
+Banda03_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B03_(Raw).tiff")
+Banda04_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B04_(Raw).tiff")
+Banda08_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B08_(Raw).tiff")
+Banda8A_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B8A_(Raw).tiff")
+Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw).tiff")
+
+
+
+
+#Calcolo degli indici spettrali per l'anno 2020
+
+
+
+NDVI_2020 <- (Banda08_2020 - Banda04_2020) / (Banda08_2020 + Banda04_2020)
+summary(NDVI_2020)
+plot(NDVI_2020)
+vegetazione_2020 <- NDVI_2020 > 0.3
+plot(vegetazione_2020, main = "Maschera Vegetazione 2020")
+
+
+setwd("C:/Users/kiko9/Downloads/esametele/2020")
+list.files("C:/Users/kiko9/Downloads/esametele/2020")
+TRUECOL2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_True_color.tiff")
+plot(TRUECOL2020)
+NDWI_2020 <- rast( "2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_NDWI.tiff")
+plot(NDWI_2020)
+
+#multiframe
+par(mfrow=c(1,2))
+plot(TRUECOL2020)
+plot(NDWI_2020)
+
+dev.off()
+
+plot(NDWI_2020, main= "Normalize Difference Water Index 2020")
+IndexNDWI_2020 <-  (Banda03_2020 - Banda08_2020) / (Banda03_2020 + Banda08_2020)
+summary(IndexNDWI_2020)
+plot(IndexNDWI_2020)
+
+rcl <- matrix(c(
+  -Inf, -0.6, 1,   # Classe 1: Urbano o suolo molto secco # Riga 1: Valori da -Inf a -0.6 saranno classificati come 1
+  -0.6, -0.4, 2,   # Classe 2: Suolo secco/nudo # Riga 2: Valori da -0.6 a -0.4 saranno classificati come 2
+  -0.4, 0, 3,      # Classe 3: Vegetazione scarsa  # Riga 3: Valori da -0.4 a 0 saranno classificati come 3
+  0, 0.2, 4,       # Classe 4: Vegetazione ricca o aree umide # Riga 4: Valori da 0 a 0.2 saranno classificati come 4
+  0.2, Inf, 5      # Classe 5: Acqua # Riga 5: Valori da 0.2 a Inf saranno classificati come 5
+), ncol = 3, byrow = TRUE)
+ 
+classified_NDWI_2020 <- classify(IndexNDWI_2020, rcl)
+
+plot(classified_NDWI_2020, col = viridis(100), main = "Classificazione NDWI 2020")
+
+
+
+
+
+
+# per valori -0.7 suolo asciutto, aree urbane, suolo nudo. Per valori -0.4 a -0.2 vegetazione stressata; da -0.2 a 0.3 aree agricole più o meno irrigate; da 0.2 in sù terreni saturi di acqua 
+
+
+FreqNDWI_2020 <- freq(classified_NDWI_2020)
+FreqNDWI_2020
+#1° classe area senza o con poca acqua: 1346655 pixels; 2° classe aree sature di acqua: 845 pixels
+tot2020 <- ncell(NDWI_2020)
+tot2020
+#il numero di celle del raster NDWI_2020 sono 1347500
+#la proporzione è la frequenza diviso il totale
+prop2020 = FreqNDWI_2020 / tot2020
+prop2020
+
+
+
+
+
+
+
+
+
+
+
+
+
+
