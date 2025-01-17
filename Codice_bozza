@@ -66,14 +66,9 @@ Banda12_2024 <- rast ("2024-05-24-00_00_2024-05-24-23_59_Sentinel-2_L1C_B12_(Raw
 
 setwd("C:/Users/kiko9/Downloads/esametele/2020")
 list.files("C:/Users/kiko9/Downloads/esametele/2020")
-NDVI_2020 <- (Banda08_2020 - Banda04_2020) / (Banda08_2020 + Banda04_2020)
-summary(NDVI_2020)
-plot(NDVI_2020)
-vegetazione_2020 <- NDVI_2020 > 0.3
-plot(vegetazione_2020, main = "Maschera Vegetazione 2020")
 
-TRUECOL2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_True_color.tiff")
-plot(TRUECOL2020)
+TRUECOL_2020 <- rast("2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_True_color.tiff")
+plot(TRUECOL_2020)
 NDWI_2020 <- rast( "2020-05-25-00_00_2020-05-25-23_59_Sentinel-2_L1C_NDWI.tiff")
 plot(NDWI_2020)
 
@@ -81,8 +76,14 @@ plot(NDWI_2020)
 par(mfrow=c(1,2))
 plot(TRUECOL2020)
 plot(NDWI_2020)
-
 dev.off()
+
+NDVI_2020 <- (Banda08_2020 - Banda04_2020) / (Banda08_2020 + Banda04_2020)
+summary(NDVI_2020)
+plot(NDVI_2020)
+veg_mask_2020 <- NDVI_2020 > 0.3
+plot(vegetazione_2020, main = "Maschera Vegetazione 2020")
+
 
 # clusterizzazione dell'immagine dividendola in classi
 
@@ -145,41 +146,136 @@ plot(MSI_2020, col=magma(100), main = "Indice Stress Idrico della Vegetazione 20
 setwd("C:/Users/kiko9/Downloads/esametele/2021")
 list.files("C:/Users/kiko9/Downloads/esametele/2021")
 
-NDWI_2020 <- rast("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_NDWI.tiff")
+NDWI_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_NDWI.tiff")
+TRUECOL_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_True_color.tiff")
+SWIR_2021 <- rast ("2021-05-20-00_00_2021-05-20-23_59_Sentinel-2_L1C_SWIR.tiff")
+par(mfrow=c(1,3))
+plot(TRUECOL_2021)
+plot(NDWI_2021)
+plot(SWIR_2021)
 
-
-
-
-
-
-setwd("C:/Users/Mattia/Desktop/mattia/università/SGN/Telerilevamento/water/2021") 
-list.files("C:/Users/Mattia/Desktop/mattia/università/SGN/Telerilevamento/water/2021")
-wat2021NDWI <- rast("2021-04-19-00_00_2021-04-19-23_59_Sentinel-2_L2A_NDWI.tiff")
-wat2021trcol <- rast("2021-04-19-00_00_2021-04-19-23_59_Sentinel-2_L2A_True_color.tiff")
-wat2021swir <- rast("2021-04-19-00_00_2021-04-19-23_59_Sentinel-2_L2A_SWIR.tiff")
-par(mfrow=c(1,2))
-plot(wat2021trcol)
-plot(wat2021NDWI)
 dev.off()
-# NDVI
-NDVI2021 <- (Band08_2021 - Band04_2021) / (Band08_2021 + Band04_2021)
-summary(NDVI2021)
-veg_mask2021 <- NDVI2021 > 0.3
-plot(veg_mask2021, main="Maschera Vegetazione 2021")
-# classificazione
-class_colors <- c("gray", "blue", "brown", "green")
-wat2021c <- im.classify(wat2021NDWI, 4, seed = TRUE)
-plot(wat2021c, col = class_colors, main = "Classificazione 2021")
-# 1= dry salt pan; 2= water; 3=soil; 4=vegetation
-# frequenze
-fwat2021c <- freq(wat2021c)
-fwat2021c
-# dry salt pan= 334633 (14,1%); water= 228097 (9,6%); vegetation= 1023641 (43%); soil= 791129 (33,3%)
-# proporzioni
-tot2021 <- ncell(wat2021c)
+
+#calcolo NDVI
+
+NDVI_2021 <- (Banda08_2021 - Banda04_2021) / (Banda08_2021 + Banda04_2021)
+summary(NDVI_2021)
+veg_mask_2021 <- NDVI_2021 > 0.3
+plot(veg_mask_2021, main = "Maschera Vegetazione 2021")
+
+#classificazione in classi
+
+plot(NDWI_2021, main= "Normalize Difference Water Index 2020")
+IndexNDWI_2021 <-  (Banda03_2021 - Banda08_2021) / (Banda03_2021 + Banda08_2021)
+summary(IndexNDWI_2021)
+plot(IndexNDWI_2021)
+
+
+
+rcl <- matrix(c(
+  -Inf, -0.6, 1,   # Classe 1: Urbano o suolo molto secco # Riga 1: Valori da -Inf a -0.6 saranno classificati come 1
+  -0.6, -0.4, 2,   # Classe 2: Suolo secco/nudo # Riga 2: Valori da -0.6 a -0.4 saranno classificati come 2
+  -0.4, 0, 3,      # Classe 3: Vegetazione scarsa  # Riga 3: Valori da -0.4 a 0 saranno classificati come 3
+  0, 0.2, 4,       # Classe 4: Vegetazione ricca o aree umide # Riga 4: Valori da 0 a 0.2 saranno classificati come 4
+  0.2, Inf, 5      # Classe 5: Acqua # Riga 5: Valori da 0.2 a Inf saranno classificati come 5
+), ncol = 3, byrow = TRUE)
+
+
+
+ 
+classified_NDWI_2021 <- classify(IndexNDWI_2021, rcl)
+
+plot(classified_NDWI_2021, col = viridis(100), main = "Classificazione NDWI 2021")
+
+# calcolo la frequenza e la percentuale delle varie classi
+
+FreqNDWI_2021 <- freq(classified_NDWI_2021)
+FreqNDWI_2021
+# per la 1° classe: 277968; 2° classe: 602088; 3° classe: 465964; 4° classe: 475; 5° classe: 1005 pixels
+
+tot2021 <- ncell(NDWI_2021)
 tot2021
-prop2021 = fwat2021c / tot2021
+#il numero di celle del raster NDWI_2021 sono 1347500 che è lo stesso di quello per IndexNDWI_2021
+#la proporzione è la frequenza diviso il totale
+prop2021 = FreqNDWI_2021 / tot2021
 prop2021
+# La 1° classe: 0.2062842301 20,6%; 2° classe: 0.4468185529 44,7%; 3° classe: 0.3457988868  34,6%; 4° classe: 0.0003525046 0.03%; 5° classe: 0.0007458256 0.07%
+
+dev.off()
 
 
 
+
+
+
+#Calcolo indici anno 2022
+setwd("C:/Users/kiko9/Downloads/esametele/2022")
+list.files("C:/Users/kiko9/Downloads/esametele/2022")
+
+
+
+NDWI_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_NDWI.tiff")
+TRUECOL_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_True_color.tiff")
+SWIR_2022 <- rast ("2022-05-28-00_00_2022-05-28-23_59_Sentinel-2_L1C_SWIR.tiff")
+par(mfrow=c(1,3))
+plot(TRUECOL_2022)
+plot(NDWI_2022)
+plot(SWIR_2022)
+
+#NDWI_2022 ha valori più elevati di 1
+#Puoi normalizzare i valori del raster per farli rientrare nell'intervallo [0,1] utilizzando il range attuale (Min e Max)
+NDWI_2022_normalized <- (NDWI_2022 - min_value) / (max_value - min_value)
+summary(NDWI_2022_normalized)
+im.plotRGB.auto(NDWI_2022_normalized)
+
+IndexNDWI_2022 <-  (Banda03_2022 - Banda08_2022) / (Banda03_2022 + Banda08_2022)
+summary(IndexNDWI_2022)
+plot(IndexNDWI_2022)
+dev.off()
+
+#calcolo NDVI
+
+NDVI_2022 <- (Banda08_2022 - Banda04_2022) / (Banda08_2022 + Banda04_2022)
+summary(NDVI_2022)
+veg_mask_2022 <- NDVI_2022 > 0.3
+plot(veg_mask_2022, main = "Maschera Vegetazione 2022")
+
+#classificazione in classi
+
+im.plotRGB.auto(NDWI_2022_normalized, main= "Normalize Difference Water Index 2022")
+IndexNDWI_2021 <-  (Banda03_2021 - Banda08_2021) / (Banda03_2021 + Banda08_2021)
+summary(IndexNDWI_2021)
+plot(IndexNDWI_2021)
+
+
+
+rcl <- matrix(c(
+  -Inf, -0.6, 1,   # Classe 1: Urbano o suolo molto secco # Riga 1: Valori da -Inf a -0.6 saranno classificati come 1
+  -0.6, -0.4, 2,   # Classe 2: Suolo secco/nudo # Riga 2: Valori da -0.6 a -0.4 saranno classificati come 2
+  -0.4, 0, 3,      # Classe 3: Vegetazione scarsa  # Riga 3: Valori da -0.4 a 0 saranno classificati come 3
+  0, 0.2, 4,       # Classe 4: Vegetazione ricca o aree umide # Riga 4: Valori da 0 a 0.2 saranno classificati come 4
+  0.2, Inf, 5      # Classe 5: Acqua # Riga 5: Valori da 0.2 a Inf saranno classificati come 5
+), ncol = 3, byrow = TRUE)
+
+
+
+ 
+classified_NDWI_2021 <- classify(IndexNDWI_2021, rcl)
+
+plot(classified_NDWI_2021, col = viridis(100), main = "Classificazione NDWI 2021")
+
+# calcolo la frequenza e la percentuale delle varie classi
+
+FreqNDWI_2021 <- freq(classified_NDWI_2021)
+FreqNDWI_2021
+# per la 1° classe: 277968; 2° classe: 602088; 3° classe: 465964; 4° classe: 475; 5° classe: 1005 pixels
+
+tot2021 <- ncell(NDWI_2021)
+tot2021
+#il numero di celle del raster NDWI_2021 sono 1347500 che è lo stesso di quello per IndexNDWI_2021
+#la proporzione è la frequenza diviso il totale
+prop2021 = FreqNDWI_2021 / tot2021
+prop2021
+# La 1° classe: 0.2062842301 20,6%; 2° classe: 0.4468185529 44,7%; 3° classe: 0.3457988868  34,6%; 4° classe: 0.0003525046 0.03%; 5° classe: 0.0007458256 0.07%
+
+dev.off()
