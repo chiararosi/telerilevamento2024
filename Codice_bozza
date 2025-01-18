@@ -74,7 +74,7 @@ plot(NDWI_2020)
 
 #multiframe
 par(mfrow=c(1,2))
-plot(TRUECOL2020)
+plot(TRUECOL_2020)
 plot(NDWI_2020)
 dev.off()
 
@@ -100,9 +100,9 @@ rcl <- matrix(c(
   0.2, Inf, 5      # Classe 5: Acqua # Riga 5: Valori da 0.2 a Inf saranno classificati come 5
 ), ncol = 3, byrow = TRUE)
  
-classified_NDWI_2020 <- classify(IndexNDWI_2020, rcl)
+classified_2020 <- classify(IndexNDWI_2020, rcl)
 
-plot(classified_NDWI_2020, col = viridis(100), main = "Classificazione NDWI 2020")
+plot(classified_2020, col = viridis(100), main = "Classificazione 2020")
 
 # calcolo la frequenza e la percentuale delle varie classi
 
@@ -135,13 +135,6 @@ im.plotRGB(stack_2020, r=1, g=2, b=3)
 dev.off()
 
 
-
-
-#Moisture Stress Index MSI= SWIR/NIR
-MSI_2020 <- (Banda12_2020)/(Banda08_2020)
-plot(MSI_2020, col=magma(100), main = "Indice Stress Idrico della Vegetazione 2020")
-
-
 #Calcolo indici anno 2021
 setwd("C:/Users/kiko9/Downloads/esametele/2021")
 list.files("C:/Users/kiko9/Downloads/esametele/2021")
@@ -172,7 +165,7 @@ plot(IndexNDWI_2021)
 
 
 
-rcl <- matrix(c(
+rcl1 <- matrix(c(
   -Inf, -0.6, 1,   # Classe 1: Urbano o suolo molto secco # Riga 1: Valori da -Inf a -0.6 saranno classificati come 1
   -0.6, -0.4, 2,   # Classe 2: Suolo secco/nudo # Riga 2: Valori da -0.6 a -0.4 saranno classificati come 2
   -0.4, 0, 3,      # Classe 3: Vegetazione scarsa  # Riga 3: Valori da -0.4 a 0 saranno classificati come 3
@@ -183,9 +176,9 @@ rcl <- matrix(c(
 
 
  
-classified_NDWI_2021 <- classify(IndexNDWI_2021, rcl)
+classified_2021 <- classify(IndexNDWI_2021, rcl1)
 
-plot(classified_NDWI_2021, col = viridis(100), main = "Classificazione NDWI 2021")
+plot(classified_2021, col = viridis(100), main = "Classificazione 2021")
 
 # calcolo la frequenza e la percentuale delle varie classi
 
@@ -245,7 +238,7 @@ plot(veg_mask_2022, main = "Maschera Vegetazione 2022")
 
 #classificazione in classi
 
-im.plotRGB.auto(NDWI_2022_normalized, main= "Normalize Difference Water Index 2022")
+im.plotRGB.auto (NDWI_2022_normalized, main= "Normalize Difference Water Index 2022") #posso anche non farlo
 IndexNDWI_2022 <-  (Banda03_2022 - Banda08_2022) / (Banda03_2022 + Banda08_2022)
 summary(IndexNDWI_2022)
 plot(IndexNDWI_2022)
@@ -261,9 +254,9 @@ rcl2 <- matrix(c(
 ), ncol = 3, byrow = TRUE)
 
  
-classified_NDWI_2022 <- classify (IndexNDWI_2022, rcl2)
+classified_2022 <- classify (IndexNDWI_2022, rcl2)
 
-plot (classified_NDWI_2022, col = viridis(100), main = "Classificazione NDWI 2022")
+plot (classified_2022, col = viridis(100), main = "Classificazione 2022")
 
 # calcolo la frequenza e la percentuale delle varie classi
 
@@ -323,9 +316,9 @@ rcl3 <- matrix(c(
 ), ncol = 3, byrow = TRUE)
 
  
-classified_NDWI_2023 <- classify (IndexNDWI_2023, rcl3)
+classified_2023 <- classify (IndexNDWI_2023, rcl3)
 
-plot (classified_NDWI_2023, col = viridis(100), main = "Classificazione NDWI 2023")
+plot (classified_2023, col = viridis(100), main = "Classificazione 2023")
 
 # calcolo la frequenza e la percentuale delle varie classi
 
@@ -385,9 +378,9 @@ rcl4 <- matrix(c(
 ), ncol = 3, byrow = TRUE)
 
  
-classified_NDWI_2024 <- classify (IndexNDWI_2024, rcl4)
+classified_2024 <- classify (IndexNDWI_2024, rcl4)
 
-plot (classified_NDWI_2024, col = viridis(100), main = "Classificazione NDWI 2024")
+plot (classified_2024, col = viridis(100), main = "Classificazione 2024")
 
 # calcolo la frequenza e la percentuale delle varie classi
 
@@ -419,12 +412,212 @@ dev.off()
 
 
 # costruisco un dataframe con le % delle diverse superfici classificate.
-class <- c("suolo arido", "suolo secco/nudo", "vegetazione scarsa", "vegetazione ricca o aree umide", "aree con acqua")
-d2020 <- c()
-d2021 <- c()
-d2022 <- c()
-d2023 <- c()
-d2024 <- c()
-# crea un dataframe combinando il vettore class e le % di ciascuna superficie.
-tabout <- data.frame(class, d2017, d2019, d2021, d2024)
-tabout
+classi <- c("arido", "nudo", "veg.scarsa", "aree.umide", "acqua")
+perc_2020 <- c(10.90, 51.77, 37.19, 0.08, 0.06)
+perc_2021<- c(20.63, 44.68, 34.58, 0.04, 0.07)
+perc_2022 <- c(3.44, 59.29, 33.63, 3.55, 0.08)
+perc_2023 <- c(9.49, 43.39, 35.30, 4.19, 7.63)
+perc_2024 <- c(14.21, 54.03, 31.66, 0.03, 0.07)
+# crea un dataframe combinando il vettore classi e le % di ciascuna superficie.
+tabout <- data.frame(classi, perc_2020, perc_2021, perc_2022, perc_2023, perc_2024)
+View(tabout)
+
+#ggplot per creare un grafico a barre relativo alle % dei vari anni
+bar_2020 <-ggplot(tabout, aes(x=classi, y=perc_2020, fill=classi)) + geom_bar(stat="identity") + ylab("% di copertura 2020")
+bar_2021 <-ggplot(tabout, aes(x=classi, y=perc_2021, fill=classi)) + geom_bar(stat="identity") + ylab("% di copertura 2021")
+#la scala tra i due grafici è diversa
+#come ovviare il problema: basta mettere gli assi uguali
+#la funzione è ylim()
+#ci vuole la c perché sono due elementi del vettore, ricordandoci la doppia parentesi
+#questa è proprio una funzione che si chiama ylim()
+# varying axis and using lines
+#ylim(c(0,100))
+bar_2020 <- ggplot(tabout, aes(x=classi, y=perc_2020, color=classi)) + geom_bar(stat="identity", fill="white") + ylab("% di copertura 2020") + ylim(c(0,100)) 
+bar_2020
+bar_2021 <- ggplot(tabout, aes(x=classi, y=perc_2021, color=classi)) + geom_bar(stat="identity",fill="white") + ylab("% di copertura 2021") + ylim(c(0,100))  
+bar_2021
+bar_2022 <- ggplot(tabout, aes(x=classi, y=perc_2022, color=classi)) + geom_bar(stat="identity",fill="white") + ylab("% di copertura 2022") + ylim(c(0,100))  
+bar_2022
+bar_2023 <- ggplot(tabout, aes(x=classi, y=perc_2023, color=classi)) + geom_bar(stat="identity",fill="white") + ylab("% di copertura 2023") + ylim(c(0,100)) 
+bar_2023
+bar_2024 <- ggplot(tabout, aes(x=classi, y=perc_2024, color=classi)) + geom_bar(stat="identity",fill="white") + ylab("% di copertura 2024") + ylim(c(0,100))
+bar_2024
+
+#patchwork
+bar_2020 + bar_2021 + bar_2022 + bar_2023 + bar_2024
+
+dev.off()
+
+
+# MNDWI
+# MNDWI  è un indice utilizzato per identificare le aree d'acqua su immagini satellitari, modificato rispetto all'NDWI classico.
+# valori positivi indicano la presenza di acqua.
+# valori negativi o vicini a zero indicano terreno asciutto o vegetazione.
+
+MNDWI_2020 <- ( Banda03_2020 - Banda12_2020) / ( Banda03_2020 + Banda12_2020)
+summary(MNDWI_2020)
+plot(MNDWI_2020, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2020")
+# "darkgoldenrod" per il suolo secco, "darkorange" per le zone di transizione, "deepskyblue" per l'acqua
+Maschera_acqua_2020 <- MNDWI_2020 > 0.4
+# il valore soglia lo sposto fino a 0.4 per ridurre la probabilità di falsi positivi come i campi agricoli ampiamente irrigati e le nuvole
+#visualizzazione della maschera
+plot(Maschera_acqua_2020, main="Maschera acqua 2020", legend=TRUE)
+
+#questa riga calcola il numero totale di pixel classificati come "acqua" nella maschera
+n_pixel_acqua_2020MNDWI <- sum(Maschera_acqua_2020[], na.rm = TRUE)
+n_pixel_acqua_2020MNDWI
+# Visualizzo il numero di pixel con acqua -> 4268
+totMNDWI <- ncell(MNDWI_2020)
+totMNDWI
+# il totale è 1347500
+# calcolo una % dei pixel mascherati sul totale dei pixel nell'immagine che mi indicano zone d'acqua
+pMNDWI_2020 <- n_pixel_acqua_2020MNDWI/totMNDWI
+pMNDWI_2020 
+#la percentuale è 0.003167347 * 100 =0.32%
+
+#Anno 2021
+
+MNDWI_2021 <- ( Banda03_2021 - Banda12_2021) / ( Banda03_2021 + Banda12_2021)
+summary(MNDWI_2021)
+plot(MNDWI_2021, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2021")
+# "darkgoldenrod" per il suolo secco, "darkorange" per le zone di transizione, "deepskyblue" per l'acqua
+Maschera_acqua_2021 <- MNDWI_2021 > 0.4
+# il valore soglia lo sposto  a 0.4 per ridurre la probabilità di falsi positivi come i campi agricoli ampiamente irrigati
+#visualizzazione della maschera
+plot(Maschera_acqua_2021, main="Maschera acqua 2021", legend=TRUE)
+
+n_pixel_acqua_2021MNDWI <- sum(Maschera_acqua_2021[], na.rm = TRUE)
+n_pixel_acqua_2021MNDWI
+# Visualizzo il numero di pixel con acqua -> 2068
+totMNDWI
+# il totale è 1347500
+# calcolo una % dei pixel mascherati sul totale dei pixel nell'immagine che mi indicano zone d'acqua
+pMNDWI_2021 <- n_pixel_acqua_2021MNDWI/totMNDWI
+pMNDWI_2021 
+#la percentuale è 0.001534694 * 100 =  0.15%
+
+#Anno 2022
+
+MNDWI_2022 <- ( Banda03_2022 - Banda12_2022) / ( Banda03_2022 + Banda12_2022)
+summary(MNDWI_2022)
+plot(MNDWI_2022, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2022")
+# "darkgoldenrod" per il suolo secco, "darkorange" per le zone di transizione, "deepskyblue" per l'acqua
+Maschera_acqua_2022 <- MNDWI_2022 > 0.4
+# il valore soglia lo sposto  a 0.4 per ridurre la probabilità di falsi positivi come i campi agricoli ampiamente irrigati
+#visualizzazione della maschera
+plot(Maschera_acqua_2022, main="Maschera acqua 2022", legend=TRUE)
+
+n_pixel_acqua_2022MNDWI <- sum(Maschera_acqua_2022[], na.rm = TRUE)
+n_pixel_acqua_2022MNDWI
+# Visualizzo il numero di pixel con acqua -> 1171
+totMNDWI
+# il totale è 1347500
+# calcolo una % dei pixel mascherati sul totale dei pixel nell'immagine che mi indicano zone d'acqua
+pMNDWI_2022 <- n_pixel_acqua_2022MNDWI/totMNDWI
+pMNDWI_2022 
+#la percentuale è 0.0008690167 * 100 =  0.09%
+
+#Anno 2023
+
+MNDWI_2023 <- ( Banda03_2023 - Banda12_2023) / ( Banda03_2023 + Banda12_2023)
+summary(MNDWI_2023)
+plot(MNDWI_2023, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2023")
+# "darkgoldenrod" per il suolo secco, "darkorange" per le zone di transizione, "deepskyblue" per l'acqua
+Maschera_acqua_2023 <- MNDWI_2023 > 0.4
+# il valore soglia lo sposto  a 0.4 per ridurre la probabilità di falsi positivi come i campi agricoli ampiamente irrigati
+#visualizzazione della maschera
+plot(Maschera_acqua_2023, main="Maschera acqua 2023", legend=TRUE)
+
+n_pixel_acqua_2023MNDWI <- sum(Maschera_acqua_2023[], na.rm = TRUE)
+n_pixel_acqua_2023MNDWI
+# Visualizzo il numero di pixel con acqua -> 228831
+totMNDWI
+# il totale è 1347500
+# calcolo una % dei pixel mascherati sul totale dei pixel nell'immagine che mi indicano zone d'acqua
+pMNDWI_2023 <- n_pixel_acqua_2023MNDWI/totMNDWI
+pMNDWI_2023 
+#la percentuale è  0.1698189 * 100 =  17%
+
+#Anno 2024
+
+MNDWI_2024 <- ( Banda03_2024 - Banda12_2024) / ( Banda03_2024 + Banda12_2024)
+summary(MNDWI_2024)
+plot(MNDWI_2024, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2024")
+# "darkgoldenrod" per il suolo secco, "darkorange" per le zone di transizione, "deepskyblue" per l'acqua
+Maschera_acqua_2024 <- MNDWI_2024 > 0.4
+# il valore soglia lo sposto  a 0.4 per ridurre la probabilità di falsi positivi come i campi agricoli ampiamente irrigati
+#visualizzazione della maschera
+plot(Maschera_acqua_2024, main="Maschera acqua 2024", legend=TRUE)
+
+n_pixel_acqua_2024MNDWI <- sum(Maschera_acqua_2024[], na.rm = TRUE)
+n_pixel_acqua_2024MNDWI
+# Visualizzo il numero di pixel con acqua -> 3533
+totMNDWI
+# il totale è 1347500
+# calcolo una % dei pixel mascherati sul totale dei pixel nell'immagine che mi indicano zone d'acqua
+pMNDWI_2024 <- n_pixel_acqua_2024MNDWI/totMNDWI
+pMNDWI_2024 
+#la percentuale è 0.002621892 * 100 =  0.26%
+
+dev.off()
+
+par(mfrow=c(2,3))
+plot(MNDWI_2020, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2020")
+plot(MNDWI_2021, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2021")
+plot(MNDWI_2022, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2022")
+plot(MNDWI_2023, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2023")
+plot(MNDWI_2024, col=colorRampPalette(c("darkgoldenrod", "darkorange", "deepskyblue"))(100), main="MNDWI 2024")
+
+dev.off()
+
+par(mfrow=c(2,3))
+plot(Maschera_acqua_2020, main="Maschera acqua 2020", legend=TRUE)
+plot(Maschera_acqua_2021, main="Maschera acqua 2021", legend=TRUE)
+plot(Maschera_acqua_2022, main="Maschera acqua 2022", legend=TRUE)
+plot(Maschera_acqua_2023, main="Maschera acqua 2023", legend=TRUE)
+plot(Maschera_acqua_2024, main="Maschera acqua 2024", legend=TRUE)
+
+dev.off()
+
+# differenze per vedere e analizzare come la disponibilità del volume d'acqua sia cambiata tra i vari anni
+
+MNDWI_diff <- MNDWI_2024 - MNDWI_2023
+cldiff <- colorRampPalette(c("red", "white", "blue"))(100)
+plot(MNDWI_diff, col=cldiff, main= "Differenza MNDWI 2024 - 2023")
+
+par(mfrow = c(1,3))
+
+MNDWI_diff2 <- MNDWI_2023 - MNDWI_2022
+plot(MNDWI_diff2, col=cldiff, main= "Differenza MNDWI 2023 - 2022")
+
+MNDWI_diff3 <- MNDWI_2022 - MNDWI_2021
+plot(MNDWI_diff3, col=cldiff, main= "Differenza MNDWI 2022 - 2021")
+
+MNDWI_diff4 <- MNDWI_2021 - MNDWI_2020
+plot(MNDWI_diff4, col=cldiff, main= "Differenza MNDWI 2021 - 2020")
+
+dev.off()
+
+par(mfrow=c(1,3))
+
+MNDWI_diff5 <- MNDWI_2023 - MNDWI_2022
+plot(MNDWI_diff5, col=cldiff, main="Differenza MNDWI 20223 - 2022")
+
+MNDWI_diff6 <- MNDWI_2023 - MNDWI_2021
+plot(MNDWI_diff6, col=cldiff, main="Differenza MNDWI 2023 - 2021")
+
+MNDWI_diff7 <- MNDWI_2023 - MNDWI_2020
+plot(MNDWI_diff7, col=cldiff, main="Differenza MNDWI 2023 - 2020")
+
+
+#NDWI
+
+
+
+
+
+
+
+
+
+
